@@ -1,0 +1,41 @@
+{
+  "name": "mvc",
+  "version": "0.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Rodrigo Alves Do Espirito Santo",
+  "main": "index.js",
+  "type": "commonjs",
+  "bin": {
+    "cli": "cli.ts",
+    "index": "index.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "_moduleAliases": {
+    "@": "src/"
+  },
+  "dependencies": {
+    "@dotenvx/dotenvx": "^1.33.0",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pug": "^3.0.3",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/module-alias": "^2.0.4",
+    "@types/node": "^22.10.7",
+    "esbuild": "^0.24.2",
+    "nodemon": "^3.1.9",
+    "sequelize-typescript": "^2.1.6",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

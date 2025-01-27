@@ -18,7 +18,7 @@ export default class Serve extends Command {
 
     // ========================================================================
 
-    protected defineArguments () {
+    protected defineArguments (): void {
         this.argument(
             '[env]',
             'Environment of the application (e.g., development, production)'

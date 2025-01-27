@@ -1,6 +1,7 @@
 import Command from "@/commands/Command";
 
-import { CommandTemplate } from '../../../templates'
+// Templates
+import { CommandTemplate } from '@/templates'
 
 type ModuleType = (
     'command'

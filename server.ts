@@ -8,6 +8,9 @@ import { resolve } from 'path'
 // Config 
 import corsConfig from './src/config/cors'
 
+// Routes
+import applicactionRouter from '@/routes'
+
 /**
  * Instantiate a new server
  */
@@ -18,6 +21,7 @@ export default class Server {
     constructor () {
         this.applyConfig()
         this.defineServer()
+        this.defineRouter()
         this.listen()
     }
 
@@ -43,8 +47,14 @@ export default class Server {
 
     // ------------------------------------------------------------------------
 
+    private defineRouter () {
+        this.app.use(applicactionRouter.schema)
+    }
+
+    // ------------------------------------------------------------------------
+
     private listen () {
-        this.server.listen(process.env.PORT, () =>
+        this.server.listen(process.env.APP_PORT, () =>
             Log.out(`Server listening on: #[info]${process.env.APP_URL}`)
         )
     }

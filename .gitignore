@@ -4,3 +4,5 @@ dist
 .env
 .env.development
 .env.production
+
+*.code-workspace

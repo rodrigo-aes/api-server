@@ -6,7 +6,10 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 
 // Config 
-import corsConfig from './src/config/cors'
+import corsConfig from '@/config/cors'
+
+// Contexts
+import RequestContext from '@/contexts/RequestContext'
 
 // Routes
 import applicactionRouter from '@/routes'
@@ -18,16 +21,17 @@ export default class Server {
     protected app = express()
     protected server!: https.Server
 
-    constructor () {
+    constructor() {
         this.applyConfig()
         this.defineServer()
+        this.defineContexts()
         this.defineRouter()
         this.listen()
     }
 
     // ------------------------------------------------------------------------
-    
-    private defineServer () {
+
+    private defineServer() {
         this.server = https.createServer(
             {
                 cert: readFileSync(resolve('certs/server/cert.pem')),
@@ -39,7 +43,7 @@ export default class Server {
 
     // ------------------------------------------------------------------------
 
-    private applyConfig () {
+    private applyConfig() {
         this.app.use(express.json())
         this.app.use(express.urlencoded({ extended: true }))
         this.app.use(cors(corsConfig))
@@ -47,13 +51,19 @@ export default class Server {
 
     // ------------------------------------------------------------------------
 
-    private defineRouter () {
+    private defineContexts() {
+        this.app.use((req, _, next) => RequestContext.apply(req, next))
+    }
+
+    // ------------------------------------------------------------------------
+
+    private defineRouter() {
         this.app.use(applicactionRouter.schema)
     }
 
     // ------------------------------------------------------------------------
 
-    private listen () {
+    private listen() {
         this.server.listen(process.env.APP_PORT, () =>
             Log.out(`Server listening on: #[info]${process.env.APP_URL}`)
         )

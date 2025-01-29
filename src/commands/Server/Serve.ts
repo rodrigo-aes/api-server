@@ -1,7 +1,7 @@
 import Command from "@/commands/Command"
 
 import {
-    spawn, 
+    spawn,
     type SpawnOptionsWithoutStdio
 } from "child_process"
 
@@ -12,13 +12,9 @@ type Environment = 'prod' | 'dev'
 export default class Serve extends Command {
     private indexPath: string = resolve('index.ts')
 
-    constructor () {
-        super()
-    }
-
     // ========================================================================
 
-    protected defineArguments (): void {
+    protected defineArguments(): void {
         this.argument(
             '[env]',
             'Environment of the application (e.g., development, production)'
@@ -53,7 +49,7 @@ export default class Serve extends Command {
 
     // ========================================================================
 
-    private proccessOptions (env: Environment): SpawnOptionsWithoutStdio {
+    private proccessOptions(env: Environment): SpawnOptionsWithoutStdio {
         return {
             env: {
                 ...process.env,
@@ -68,7 +64,7 @@ export default class Serve extends Command {
 
     // ========================================================================
 
-    private handleNodeEnv (env: Environment): 'production' | 'development' {
+    private handleNodeEnv(env: Environment): 'production' | 'development' {
         switch (env.toLowerCase()) {
             default:
             case 'prod': return 'production'
@@ -78,7 +74,7 @@ export default class Serve extends Command {
 
     // ========================================================================
 
-    private handleRunCommand (env: Environment): string[] {
+    private handleRunCommand(env: Environment): string[] {
         switch (env.toLowerCase()) {
             default:
             case 'prod': return ['tsx', this.indexPath]
@@ -88,7 +84,7 @@ export default class Serve extends Command {
 
     // ========================================================================
 
-    private handleIncludeWorkspaces (): string {
+    private handleIncludeWorkspaces(): string {
         return (this.opts().workspaces || []).join('|')
     }
 }

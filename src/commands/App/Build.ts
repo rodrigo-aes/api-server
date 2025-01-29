@@ -9,13 +9,9 @@ export default class Build extends Command {
     private packageJson!: any
     private workspaces!: string[]
 
-    constructor () {
-        super()
-    }
-
     // ========================================================================
 
-    protected defineArguments(): void {}
+    protected defineArguments(): void { }
 
     // ========================================================================
 
@@ -28,7 +24,7 @@ export default class Build extends Command {
         this.option(
             '--outDir <value>',
             'Define out file path'
-        )   
+        )
     }
 
     // ========================================================================
@@ -44,18 +40,18 @@ export default class Build extends Command {
 
     // ========================================================================
 
-    private defineOutDir () {
+    private defineOutDir() {
         const outDir = this.opts().outDir
         this.outDir = outDir ?? 'dist'
     }
 
     // ========================================================================
 
-    private handleBuild () {
+    private handleBuild() {
         Log.out('#[warning] Generating application production build...')
 
         const esbuild = spawn(
-            'npx', 
+            'npx',
             [
                 'esbuild',
                 'index.ts',
@@ -74,7 +70,7 @@ export default class Build extends Command {
 
         esbuild.stdout.on('data', (data) => console.log(data.toString()));
         esbuild.stderr.on('data', (data) => console.log(data.toString()));
-        
+
         esbuild.on('close', (code) => {
             if (code === 0) Log.out(
                 '#[success] Application build proccess success!'
@@ -87,7 +83,7 @@ export default class Build extends Command {
 
     // ========================================================================
 
-    private handlePackageJson () {
+    private handlePackageJson() {
         Log.out('#[info]Coping package.json to destination...')
 
         this.loadPackageJson()
@@ -99,27 +95,27 @@ export default class Build extends Command {
 
     // ========================================================================
 
-    private loadPackageJson () {
+    private loadPackageJson() {
         const path = resolve('package.json')
         this.packageJson = JSON.parse(readFileSync(path, 'utf8'))
     }
 
     // ========================================================================
 
-    private alterPackageJson () {
+    private alterPackageJson() {
         this.packageJson.type = 'commonjs'
     }
 
     // ========================================================================
 
-    private savePackageJson () {
+    private savePackageJson() {
         const dest = join(this.outDir, 'package.json');
         writeFileSync(dest, JSON.stringify(this.packageJson, null, 2))
     }
 
     // ========================================================================
 
-    private handleWorkspaces () {
+    private handleWorkspaces() {
         this.workspaces = [
             'production',
             ...(this.opts().workspaces ?? [])
@@ -130,14 +126,14 @@ export default class Build extends Command {
 
     // ========================================================================
 
-    private handleEnvironmentFiles () {
+    private handleEnvironmentFiles() {
         this.copyEnvifile()
         this.workspaces.forEach(workspace => this.copyEnvifile(workspace))
     }
 
     // ========================================================================
 
-    private copyEnvifile (workspace?: string) {
+    private copyEnvifile(workspace?: string) {
         const filename = `.env${workspace ? `.${workspace}` : ''}`
 
         const origin = resolve(filename)
@@ -148,7 +144,7 @@ export default class Build extends Command {
 
     // ========================================================================
 
-    private copyCerts () {
+    private copyCerts() {
         const origin = resolve('certs')
         const dest = join(this.outDir, 'certs')
 

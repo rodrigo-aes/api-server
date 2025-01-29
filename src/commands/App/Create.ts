@@ -12,10 +12,6 @@ export default class Create extends Command {
     private className!: string
     private path?: string
 
-    constructor () {
-        super()
-    }
-
     // ========================================================================
 
     protected defineArguments(): void {
@@ -25,7 +21,7 @@ export default class Create extends Command {
 
     // ========================================================================
 
-    protected defineOptions(): void {}
+    protected defineOptions(): void { }
 
     // ========================================================================
 
@@ -41,7 +37,7 @@ export default class Create extends Command {
 
     // ========================================================================
 
-    private handleModuleName (): void {
+    private handleModuleName(): void {
         const path = this.fullname.split('/')
 
         this.className = path.pop() as string
@@ -50,11 +46,11 @@ export default class Create extends Command {
 
     // ========================================================================
 
-    private createNewCommand () {
+    private createNewCommand() {
         new CommandTemplate({
             className: this.className,
             path: this.path
         })
-        .putFile()
+            .putFile()
     }
 }

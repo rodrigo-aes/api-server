@@ -11,7 +11,7 @@ export default class CommandTemplate extends ModuleTemplate {
     protected className: string
     protected sufix?: string | undefined
 
-    constructor ({ className, path }: CommandTemplateArgs) {
+    constructor({ className, path }: CommandTemplateArgs) {
         super()
 
         this.path = path ?? ''
@@ -20,16 +20,11 @@ export default class CommandTemplate extends ModuleTemplate {
 
     // ========================================================================
 
-    protected content () {
+    protected content() {
         return `
             import Command from "@/commands/Command"
 
             export default class ${this.className} extends Command {
-                constructor() {
-                    super()
-                }
-
-                // ========================================================================
 
                 /**
                  * Define command positional arguments

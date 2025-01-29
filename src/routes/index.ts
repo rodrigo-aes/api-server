@@ -1,8 +1,6 @@
 import Router from "./Router"
 import V1Router from '@/routes/API/V1'
 
-import RequestContext from "@/contexts/RequestContext"
-
 const applicactionRouter = new Router()
 
 // Routers

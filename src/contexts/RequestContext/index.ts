@@ -5,13 +5,28 @@ import type { RequestContextMap } from "./types"
 
 class RequestContext extends AsyncLocalStorage<RequestContextMap> {
     public apply(req: Request, next: NextFunction) {
-        return super.run({ req }, next)
+        return super.run(this.initMap(req), next)
+    }
+
+    // ------------------------------------------------------------------------
+
+    private initMap(req: Request): RequestContextMap {
+        return {
+            req,
+            skip: []
+        }
     }
 
     // ------------------------------------------------------------------------
 
     public get req() {
         return this.getStore()?.req
+    }
+
+    // ------------------------------------------------------------------------
+
+    public get skip() {
+        return this.getStore()?.skip ?? []
     }
 }
 

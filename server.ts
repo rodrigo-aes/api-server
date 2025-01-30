@@ -7,6 +7,7 @@ import { resolve } from 'path'
 
 // Config 
 import corsConfig from '@/config/cors'
+import middlewareConfig from '@/config/middleware'
 
 // Contexts
 import RequestContext from '@/contexts/RequestContext'
@@ -25,6 +26,7 @@ export default class Server {
         this.applyConfig()
         this.defineServer()
         this.defineContexts()
+        this.defineMiddlewares()
         this.defineRouter()
         this.listen()
     }
@@ -47,12 +49,23 @@ export default class Server {
         this.app.use(express.json())
         this.app.use(express.urlencoded({ extended: true }))
         this.app.use(cors(corsConfig))
+        this.app.set("trust proxy", true);
     }
 
     // ------------------------------------------------------------------------
 
     private defineContexts() {
         this.app.use((req, _, next) => RequestContext.apply(req, next))
+    }
+
+    // ------------------------------------------------------------------------
+
+    private defineMiddlewares() {
+        middlewareConfig.global.forEach(
+            middleware => this.app.use(
+                (...args) => new middleware().run(...args)
+            )
+        )
     }
 
     // ------------------------------------------------------------------------

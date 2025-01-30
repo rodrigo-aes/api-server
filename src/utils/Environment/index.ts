@@ -6,14 +6,14 @@ import dotenvx from '@dotenvx/dotenvx'
 class Environment {
     private workspaces: string[]
 
-    constructor () {
+    constructor() {
         this.workspaces = this.defineWorkspaces()
         this.applyConfig()
     }
 
     // ======================================================================== 
 
-    private applyConfig () {
+    private applyConfig() {
         dotenvx.config({
             path: [
                 '.env',
@@ -25,7 +25,7 @@ class Environment {
 
     // ======================================================================== 
 
-    private defineWorkspaces () {
+    private defineWorkspaces() {
         if (process.env.WORKSPACES) return process.env.WORKSPACES
             .split('|')
             .map(workspace => `.env.${workspace}`)
@@ -34,4 +34,4 @@ class Environment {
     }
 }
 
-export default Environment
+export default new Environment

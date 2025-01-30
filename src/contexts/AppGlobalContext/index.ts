@@ -1,13 +1,13 @@
 import Log from "@/utils/Log";
 
 class AppGlobalContext {
-    constructor () {
+    constructor() {
         this.defineLog()
     }
 
-    private defineLog () {
+    private defineLog() {
         globalThis.Log = Log;
     }
 }
 
-export default AppGlobalContext
+export default new AppGlobalContext

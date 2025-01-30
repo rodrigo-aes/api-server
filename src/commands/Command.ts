@@ -1,12 +1,12 @@
 import { Command as CommanderCommand } from "commander"
 
 abstract class Command extends CommanderCommand {
-    constructor () {
+    constructor() {
         super()
 
         this.defineName()
         this.baseOptions()
-        
+
         this.defineArguments()
         this.defineOptions()
 
@@ -15,29 +15,45 @@ abstract class Command extends CommanderCommand {
 
     // ========================================================================
 
-    private defineName () {
+    private defineName() {
         this.name(this.constructor.name.toLowerCase())
     }
 
     // ========================================================================
 
-    private baseOptions () {
+    private baseOptions() {
         this.option('-v, --verbose', 'Enable verbose output');
     }
 
     // ========================================================================
 
     /**
+     * Process initializing log
+     * @override
+     */
+    protected initLog(...args: any[]) { }
+
+    // ========================================================================
+
+    /**
+     * Process success log
+     * @override
+     */
+    protected successLog(...args: any[]) { }
+
+    // ========================================================================
+
+    /**
      * Define command positional arguments
      */
-    protected abstract defineArguments (): void
+    protected abstract defineArguments(): void
 
     // ========================================================================
 
     /**
      * Define command flag options
      */
-    protected abstract defineOptions (): void
+    protected abstract defineOptions(): void
 
     // ========================================================================
 
@@ -45,7 +61,7 @@ abstract class Command extends CommanderCommand {
      * 
      * @param {string[]} args - The defined arguments in order
      */
-    protected abstract handle(...args: (string|undefined)[]): void
+    protected abstract handle(...args: (string | undefined)[]): void
 }
 
 export default Command

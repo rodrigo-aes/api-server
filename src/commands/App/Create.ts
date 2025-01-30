@@ -1,7 +1,11 @@
 import Command from "@/commands/Command";
+import Log from "@/utils/Log";
 
 // Templates
 import { CommandTemplate } from '@/templates'
+
+// Decorators
+import { ProccessLog } from "@/commands/Decorators";
 
 type ModuleType = (
     'command'
@@ -25,6 +29,7 @@ export default class Create extends Command {
 
     // ========================================================================
 
+    @ProccessLog
     protected handle(type: ModuleType, name: string): void {
         this.fullname = name
         this.handleModuleName()
@@ -33,6 +38,19 @@ export default class Create extends Command {
             case 'command': this.createNewCommand()
                 break
         }
+    }
+
+    // ========================================================================
+
+    protected initLog(type: ModuleType, name: string) {
+        Log.out('');
+        Log.out(`Creating #[warning]${type} #[info]${name}...`)
+    }
+
+    // ========================================================================
+
+    protected successLog(type: ModuleType, name: string) {
+        Log.out(`${type} ${name} #[success]created successfuly`)
     }
 
     // ========================================================================

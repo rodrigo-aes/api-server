@@ -3,17 +3,23 @@ import fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 
+const exlcude = [
+    'Command.ts',
+    'Decorators'
+]
+
 const program = new Command();
 
 async function loadCommands(dir: string) {
     const files = fs.readdirSync(dir);
-
     for (const file of files) {
+        if (exlcude.includes(file)) continue
+
         const filePath = path.join(dir, file);
         const stats = fs.statSync(filePath);
 
         if (stats.isDirectory()) await loadCommands(filePath);
-        else if (file.endsWith('.ts') && file !== 'Command.ts') {
+        else if (file.endsWith('.ts')) {
             try {
                 const fileURL = pathToFileURL(filePath);
                 const { default: CommandClass } = await import(fileURL.href);

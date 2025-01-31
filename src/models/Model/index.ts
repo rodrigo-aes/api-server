@@ -5,7 +5,8 @@ import {
     DataType,
 
     BeforeFind,
-    BeforeValidate
+    BeforeValidate,
+    BeforeBulkCreate
 } from 'sequelize-typescript'
 
 import RequestContext from '@/contexts/RequestContext';
@@ -13,7 +14,7 @@ import Pagination from './Pagination';
 
 // Types
 import type { Includeable, FindOptions } from 'sequelize'
-import type { PaginateOptions } from './types';
+import type { PaginateOptions, Paginated } from './types';
 
 // Exceptions
 import { NotImplementedMethodException } from '@/Exceptions/Common'
@@ -123,16 +124,24 @@ abstract class Model<
 
     // ------------------------------------------------------------------------
 
+    /**
+     * 
+     * @param {PaginateOptions<Model>} options
+     * @returns {Promise<Paginated<Model>>} - Object containing data array
+     * of model instances and pagination
+     */
     public static async paginate(
-        { perPage, ...options }: PaginateOptions<Model>
-    ) {
+        options: PaginateOptions<Model>
+    ): Promise<Paginated<Model>> {
+        const { perPage, ...rest } = options
+
         const page = this.parsePageParam()
         const limit = perPage
         const offset = (page - 1) * perPage
 
-        const total = await this._count(options)
+        const total = await this._count(rest)
         const data = await this._findAll({
-            ...options,
+            ...rest,
             limit,
             offset
         })
@@ -185,6 +194,13 @@ abstract class Model<
     @BeforeValidate
     protected static async handleId(instance: Model) {
         if (!instance._id) instance._id = await this.genId()
+    }
+
+    // ------------------------------------------------------------------------
+
+    @BeforeBulkCreate
+    protected static async handleIds(instances: Model[]) {
+        for (const instance of instances) this.handleId(instance)
     }
 }
 

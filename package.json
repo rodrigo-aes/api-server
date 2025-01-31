@@ -22,7 +22,8 @@
     "express": "^4.21.2",
     "ioredis": "^5.4.2",
     "pug": "^3.0.3",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

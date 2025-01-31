@@ -1,5 +1,5 @@
-import { MiddewaresConfig } from "./MiddlewareConfig"
+import { MiddewareConfig } from "./MiddlewareConfig"
 
 export {
-    MiddewaresConfig
+    MiddewareConfig
 }

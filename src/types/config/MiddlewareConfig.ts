@@ -1,5 +1,5 @@
 import type Middleware from "@/middlewares/Middleware"
 
-export type MiddewaresConfig = {
+export type MiddewareConfig = {
     global: (new (...args: any[]) => Middleware)[]
 }

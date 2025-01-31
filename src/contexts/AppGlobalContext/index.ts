@@ -1,4 +1,6 @@
 import Log from "@/utils/Log";
+import Str from "@/utils/Str";
+import AppURL from "@/utils/URL";
 
 class AppGlobalContext {
     constructor() {
@@ -6,7 +8,9 @@ class AppGlobalContext {
     }
 
     private defineLog() {
-        globalThis.Log = Log;
+        globalThis.Log = Log
+        globalThis.Str = Str
+        globalThis.AppURL = AppURL
     }
 }
 

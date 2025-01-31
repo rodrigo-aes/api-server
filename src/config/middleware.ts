@@ -1,9 +1,9 @@
-import type { MiddewaresConfig } from "@/types/config"
+import type { MiddewareConfig } from "@/types/config"
 
 // Global Middlewares
 import MaxRequestsLimit from "@/middlewares/MaxRequestsLimit"
 
-const middlewareConfig: MiddewaresConfig = {
+const middlewareConfig: MiddewareConfig = {
     global: [
         MaxRequestsLimit
     ]

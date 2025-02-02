@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 
+import Log from '@/utils/Log';
+
 const exlcude = [
     'Command.ts',
     'Decorators'
@@ -40,6 +42,7 @@ loadCommands(path.resolve('src/commands')).then(() => {
         .version('0.0.0');
 
     program.parse(process.argv);
-}).catch(err => {
-    console.error('Falha ao carregar os comandos:', err);
+}).catch((err: Error) => {
+    Log.out('#[danger]Command execution error:')
+    Log.out(`#[danger]${err.name}: #[default]${err.message}`)
 });

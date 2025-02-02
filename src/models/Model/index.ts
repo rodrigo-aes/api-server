@@ -1,8 +1,11 @@
 import {
     Model as SequelizeModel,
     Column,
-    PrimaryKey,
     DataType,
+    PrimaryKey,
+    AllowNull,
+    CreatedAt,
+    UpdatedAt,
 
     BeforeFind,
     BeforeValidate,
@@ -13,8 +16,8 @@ import RequestContext from '@/contexts/RequestContext';
 import Pagination from './Pagination';
 
 // Types
-import type { Includeable, FindOptions } from 'sequelize'
-import type { PaginateOptions, Paginated } from './types';
+import type { ModelStatic, Includeable, FindOptions } from 'sequelize'
+import type { ModelAttributes, PaginateOptions, Paginated } from './types';
 
 // Exceptions
 import { NotImplementedMethodException } from '@/Exceptions/Common'
@@ -25,16 +28,37 @@ import { NotImplementedMethodException } from '@/Exceptions/Common'
 abstract class Model<
     TModelAttributes extends {} = any,
     TCreationAttributes extends {} = TModelAttributes
-> extends SequelizeModel<TModelAttributes, TCreationAttributes> {
+> extends SequelizeModel<
+    TModelAttributes,
+    TCreationAttributes
+> {
     // Columns ================================================================
     /**
      * Primary key _id
      */
+    @AllowNull(false)
     @PrimaryKey
-    @Column({ type: DataType.STRING, allowNull: false })
+    @Column(DataType.STRING)
     public _id!: string;
 
+    @CreatedAt
+    @Column(DataType.DATE)
+    declare public readonly createdAt: Date;
+
+    @UpdatedAt
+    @Column(DataType.DATE)
+    declare public readonly updatedAt: Date;
+
     // Properties =============================================================
+    /**
+     * Self getter to base class Model access child sattic methods
+     */
+    protected static get self(): ModelStatic<Model> {
+        throw new NotImplementedMethodException('self')
+    }
+
+    // ------------------------------------------------------------------------
+
     /**
      * Array of keys to exclude in response toJSON method
      * @override
@@ -102,28 +126,6 @@ abstract class Model<
 
     // ------------------------------------------------------------------------
 
-    protected static async _findByPk(id: string): Promise<Model | null> {
-        throw new NotImplementedMethodException('_findByPk')
-    }
-
-    // ------------------------------------------------------------------------
-
-    protected static async _findAll(options: FindOptions<Model>): Promise<
-        Model[]
-    > {
-        throw new NotImplementedMethodException('_findAll')
-    }
-
-    // ------------------------------------------------------------------------
-
-    protected static async _count(options: FindOptions<Model>): Promise<
-        number
-    > {
-        throw new NotImplementedMethodException('_count')
-    }
-
-    // ------------------------------------------------------------------------
-
     /**
      * 
      * @param {PaginateOptions<Model>} options
@@ -139,8 +141,10 @@ abstract class Model<
         const limit = perPage
         const offset = (page - 1) * perPage
 
-        const total = await this._count(rest)
-        const data = await this._findAll({
+        this.self.count()
+
+        const total = await this.self.count(rest)
+        const data = await this.self.findAll({
             ...rest,
             limit,
             offset
@@ -163,7 +167,7 @@ abstract class Model<
         let id: string
 
         do id = `${this._prefix}_${Str.UUIDV4()}`
-        while (await this._findByPk(id))
+        while (await this.self.findByPk(id))
 
         return id
     }
@@ -206,7 +210,12 @@ abstract class Model<
 
 export default Model
 
-import { StaticMethods } from './Decorators'
+import { StaticSelf } from './Decorators'
+
 export {
-    StaticMethods
+    StaticSelf
+}
+
+export type {
+    ModelAttributes
 }

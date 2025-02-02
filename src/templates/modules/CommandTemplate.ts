@@ -1,21 +1,20 @@
 import ModuleTemplate from "./ModuleTemplate"
-
-export type CommandTemplateArgs = {
-    className: string
-    path?: string
-}
+import type { ModuleTemplateArgs } from "./ModuleTemplate"
 
 export default class CommandTemplate extends ModuleTemplate {
-    protected base: string = 'src/commands'
+    public base: string = 'src/commands'
     protected path: string
     protected className: string
     protected sufix?: string | undefined
+    protected forceOverride?: boolean | undefined
+    protected moduleType: "module" | "package" = 'module'
 
-    constructor({ className, path }: CommandTemplateArgs) {
+    constructor({ className, path, forceOverride }: ModuleTemplateArgs) {
         super()
 
         this.path = path ?? ''
         this.className = className
+        this.forceOverride = forceOverride
     }
 
     // ========================================================================
@@ -25,6 +24,20 @@ export default class CommandTemplate extends ModuleTemplate {
             import Command from "@/commands/Command"
 
             export default class ${this.className} extends Command {
+
+                /**
+                 * Process initializing log
+                 */
+                public initLog() { }
+
+                // ========================================================================
+
+                /**
+                 * Process success log
+                 */
+                public successLog() { }
+
+                // ========================================================================
 
                 /**
                  * Define command positional arguments

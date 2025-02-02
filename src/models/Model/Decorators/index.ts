@@ -1,5 +1,5 @@
-import StaticMethods from "./StaticMethods"
+import StaticSelf from "./StaticMethods"
 
 export {
-    StaticMethods
+    StaticSelf
 }

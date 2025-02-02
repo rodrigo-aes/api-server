@@ -1,15 +1,17 @@
 import type Command from "../Command";
 
 export default function ProccessLog(
-    target: (...args: any[]) => void,
-    context: ClassMethodDecoratorContext<Command>
+    target: Command,
+    key: string,
+    descriptor: TypedPropertyDescriptor<(type: "command", name: string) => void>
 ) {
-    return function (...args: any[]) {
-        const commandInstance = args.pop()
-        args.pop()
+    const handle = descriptor.value as Function
 
-        commandInstance.initLog(...args)
-        target.call(commandInstance, ...args)
-        commandInstance.successLog(...args)
+    descriptor.value = function (...args: any[]) {
+        (this as Command).initLog(...args)
+        handle.call(this, ...args);
+        (this as Command).successLog(...args)
     }
+
+    return descriptor
 }

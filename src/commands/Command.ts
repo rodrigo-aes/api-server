@@ -31,7 +31,7 @@ abstract class Command extends CommanderCommand {
      * Process initializing log
      * @override
      */
-    protected initLog(...args: any[]) { }
+    public initLog(...args: any[]) { }
 
     // ========================================================================
 
@@ -39,7 +39,7 @@ abstract class Command extends CommanderCommand {
      * Process success log
      * @override
      */
-    protected successLog(...args: any[]) { }
+    public successLog(...args: any[]) { }
 
     // ========================================================================
 

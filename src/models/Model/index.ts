@@ -9,7 +9,9 @@ import {
 
     BeforeFind,
     BeforeValidate,
-    BeforeBulkCreate
+    BeforeBulkCreate,
+    BeforeSync,
+    AfterSync
 } from 'sequelize-typescript'
 
 import RequestContext from '@/contexts/RequestContext';
@@ -205,6 +207,20 @@ abstract class Model<
     @BeforeBulkCreate
     protected static async handleIds(instances: Model[]) {
         for (const instance of instances) this.handleId(instance)
+    }
+
+    // ------------------------------------------------------------------------
+
+    @BeforeSync
+    protected static initSyncLog() {
+        Log.out(`#[warning]Syncronizing model #[info]${this.self.name}#[warning]...`)
+    }
+
+    // ------------------------------------------------------------------------
+
+    @AfterSync
+    protected static syncSuccessLog() {
+        Log.out(`#[info]${this.self.name} #[success]model syncronized sucessfuly!`)
     }
 }
 

@@ -6,4 +6,4 @@ class ServerAccessDatabase extends Redis {
     }
 }
 
-export default new ServerAccessDatabase()
+export default new ServerAccessDatabase

@@ -2,7 +2,6 @@ import Command from "@/commands/Command"
 import { spawn } from "child_process"
 import { resolve, join } from "path"
 import { readFileSync, writeFileSync, copyFileSync, cpSync } from "fs"
-import Log from "@/utils/Log"
 
 export default class Build extends Command {
     private outDir!: string

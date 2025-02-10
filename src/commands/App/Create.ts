@@ -1,8 +1,4 @@
 import Command from "@/commands/Command";
-import Log from "@/utils/Log";
-
-import { resolve } from "path";
-import { existsSync } from "fs";
 
 // Templates
 import {

@@ -59,17 +59,6 @@ export default abstract class ModuleTemplate {
 
     // ========================================================================
 
-    private dedent(content: string): string {
-        const lines = content.split("\n");
-        const indentLength = Math.min(
-            ...lines.filter(line => line.trim().length > 0)
-                .map(line => line.match(/^\s*/)?.[0]?.length || 0)
-        );
-        return lines.map(line => line.slice(indentLength)).join("\n").trim();
-    }
-
-    // ========================================================================
-
     private verifyAlreadyExistsModuleException(dest: string) {
         if (existsSync(`${dest}/${this.handleFileName()}`))
             if (!this.forceOverride) throw new ModuleAlreadyExistsException(
@@ -81,14 +70,14 @@ export default abstract class ModuleTemplate {
 
     private createFile(dest: string) {
         const filename = this.handleFileName()
-        writeFileSync(`${dest}/${filename}`, this.dedent(this.content()))
+        writeFileSync(`${dest}/${filename}`, Str.dedent(this.content()))
     }
 
     // ========================================================================
 
     private createTypes(dest: string) {
         const content = this.types()
-        if (content) writeFileSync(`${dest}/types.ts`, this.dedent(content))
+        if (content) writeFileSync(`${dest}/types.ts`, Str.dedent(content))
     }
 
     // ========================================================================

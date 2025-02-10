@@ -17,7 +17,7 @@ class Log {
    * @param {string} message - The log message with color styles
    * 
    * @example
-   * Log.out('#[info] text info - #[success] text success') 
+   * Log.out('#[info]text info - #[success]text success') 
    */
   static out(message: string): void {
     const parsedMessage = message.replace(
@@ -28,7 +28,7 @@ class Log {
       }
     );
 
-    console.log(parsedMessage);
+    process.stdout.write(parsedMessage);
   }
 }
 

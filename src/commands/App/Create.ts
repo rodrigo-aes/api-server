@@ -1,4 +1,5 @@
 import Command from "@/commands/Command";
+import Log from "@/utils/Log";
 
 // Templates
 import {

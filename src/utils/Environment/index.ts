@@ -17,7 +17,7 @@ class Environment {
         dotenvx.config({
             path: [
                 '.env',
-                `.env.${process.env.NODE_ENV || 'production'}`,
+                `.env.${process.env.NODE_ENV || 'development'}`,
                 ...this.workspaces
             ]
         })

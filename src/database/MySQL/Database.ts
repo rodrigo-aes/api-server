@@ -25,7 +25,7 @@ export class MySQL extends Sequelize {
         await this.authenticate()
 
         Log.out(`#[info]MySQL connection to #[warning]${this.getDatabaseName()}: #[success]SUCCESS`)
-        Log.out('\n')
+        Log.out('')
     }
 
     // ========================================================================

@@ -221,6 +221,7 @@ abstract class Model<
     @AfterSync
     protected static syncSuccessLog() {
         Log.out(`#[info]${this.self.name} #[success]model syncronized sucessfuly!`)
+        Log.out('')
     }
 }
 

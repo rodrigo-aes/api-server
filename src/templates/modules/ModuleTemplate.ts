@@ -70,6 +70,7 @@ export default abstract class ModuleTemplate {
 
     private createFile(dest: string) {
         const filename = this.handleFileName()
+
         writeFileSync(`${dest}/${filename}`, Str.dedent(this.content()))
     }
 

@@ -197,6 +197,10 @@ abstract class Model<
 
     // ------------------------------------------------------------------------
 
+    /**
+     * Handle ID of the instance if not exists
+     * @param {Model} instance - Model instance
+     */
     @BeforeValidate
     protected static async handleId(instance: Model) {
         if (!instance._id) instance._id = await this.genId()
@@ -204,6 +208,10 @@ abstract class Model<
 
     // ------------------------------------------------------------------------
 
+    /**
+     * Handle ID of the instances if not exists
+     * @param {Model[]} instances - Model instances 
+     */
     @BeforeBulkCreate
     protected static async handleIds(instances: Model[]) {
         for (const instance of instances) this.handleId(instance)
@@ -211,6 +219,9 @@ abstract class Model<
 
     // ------------------------------------------------------------------------
 
+    /**
+     * Log of init sync process
+     */
     @BeforeSync
     protected static initSyncLog() {
         Log.out(`#[warning]Syncronizing model #[info]${this.self.name}#[warning]...`)
@@ -218,6 +229,9 @@ abstract class Model<
 
     // ------------------------------------------------------------------------
 
+    /**
+     * Log of success sync process
+     */
     @AfterSync
     protected static syncSuccessLog() {
         Log.out(`#[info]${this.self.name} #[success]model syncronized sucessfuly!`)

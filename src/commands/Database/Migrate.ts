@@ -34,12 +34,13 @@ export default class Migrate extends Command {
     protected defineOptions(): void {
         this.option('--force', 'Set to force reset database')
         this.option('--alter', 'Set to alter database')
+        this.option('--ignore-security', 'Set to ignore database reset on production')
     }
 
     // ========================================================================
 
     protected async handle(): Promise<void> {
-        const options = this.opts()
-        await new DatabaseMigration(options).execute()
+        const { ignoreSecurity, ...options } = this.opts()
+        await new DatabaseMigration(options, ignoreSecurity).execute()
     }
 }

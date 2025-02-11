@@ -6,17 +6,26 @@ import { type SyncOptions } from "sequelize";
 
 import { Boolean } from "@/validation/Rules";
 
+// Exceptions
+import { DatabaseResetOnProductionException } from "@/Exceptions/Database";
+
 export class DatabaseMigration {
     private options?: SyncOptions
+    private ignoreSecurity?: boolean
 
-    constructor(options?: SyncOptions) {
+    constructor(options?: SyncOptions, ignoreSecurity?: boolean) {
         this.options = options
+        this.ignoreSecurity = ignoreSecurity
     }
 
     // ========================================================================
 
     public async execute() {
-        if (this.options?.force) await this.verifyExecute()
+        if (this.options?.force) {
+            this.verifyIgnoreSecurity()
+            await this.verifyExecute()
+        }
+
         else await this.migrate()
     }
 
@@ -42,6 +51,14 @@ export class DatabaseMigration {
                 rl.close()
             }
         )
+    }
+
+    // ========================================================================
+
+    private verifyIgnoreSecurity() {
+        if (process.env.NODE_ENV === 'production')
+            if (!this.ignoreSecurity)
+                throw new DatabaseResetOnProductionException
     }
 
     // ========================================================================

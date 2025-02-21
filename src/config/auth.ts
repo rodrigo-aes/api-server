@@ -39,4 +39,5 @@ const authConfig = {
 }
 
 export type AuthConfig = typeof authConfig
+
 export default authConfig

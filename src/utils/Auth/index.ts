@@ -2,7 +2,9 @@
 import RequestContext from "@/contexts/RequestContext"
 
 // Config
-import authConfig, { type AuthConfig } from "@/config/auth"
+import authConfig, {
+    type AuthConfig
+} from "@/config/auth"
 
 // Types
 import type Authenticable from "./Authenticable"
@@ -17,15 +19,15 @@ import type {
 import { MissingAuthenticatedException } from "@/Exceptions/Auth"
 
 type SourceKey = keyof AuthConfig['sources']
+type DefaultSource = InstanceType<typeof Auth['_default']>
 
 class Auth {
     // Instance Properties ====================================================
     private authenticated: Authenticable
 
     // Static properties ======================================================
-    private static _source: AuthenticableStatic = authConfig
-        .defaultSource()
-        .model
+    private static _default = authConfig.defaultSource().model
+    private static _source: AuthenticableStatic = this._default
 
     private static sourceKey: SourceKey = authConfig
         .defaultSource()
@@ -38,6 +40,15 @@ class Auth {
 
     // Instance Methods =======================================================
     // Publics ----------------------------------------------------------------
+    /**
+     * Authenticated user
+     */
+    public user<T extends Authenticable = DefaultSource>(): T {
+        return this.authenticated as T
+    }
+
+    // ------------------------------------------------------------------------
+
     /**
      * Refresh the authenticated auth token
      * @returns {Promise<AuthData>} - A object containing auth data

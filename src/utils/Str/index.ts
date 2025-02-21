@@ -1,4 +1,8 @@
 import { v4 } from "uuid";
+import RandExp from "randexp";
+
+// Utils
+import Hash from "@/utils/Hash";
 
 export default class Str extends String {
     constructor(value?: any) {
@@ -15,6 +19,20 @@ export default class Str extends String {
     }
 
     // ------------------------------------------------------------------------
+
+    public static hash(string: string) {
+        return Hash.make(string)
+    }
+
+    // ------------------------------------------------------------------------
+
+    public static random(length: number) {
+        const regex = new RegExp(`^[a-zA-Z0-9]{${length}}$`)
+        return new RandExp(regex).gen()
+    }
+
+    // ------------------------------------------------------------------------
+
     /**
      * Dedent de the content string
      * @param {string} content

@@ -1,9 +1,11 @@
-import type { ModelAttributes } from "@/models/Model"
-import type { Optional } from "sequelize"
+import type {
+    AuthenticableAttributes,
+    AuthenticableCreationAttibutes
+} from "@/utils/Auth/types"
 
-export interface UserAttributes extends ModelAttributes { }
+export interface UserAttributes extends AuthenticableAttributes { }
 
-export type UserCreationAttributes = Optional<UserAttributes, (
-    'createdAt' |
-    'updatedAt'
-)>
+export type UserCreationAttributes = AuthenticableCreationAttibutes<
+    UserAttributes,
+    undefined
+>

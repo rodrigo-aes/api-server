@@ -19,7 +19,16 @@ import Pagination from './Pagination';
 
 // Types
 import type { ModelStatic, Includeable, FindOptions } from 'sequelize'
-import type { ModelAttributes, PaginateOptions, Paginated } from './types';
+import type {
+    ModelAttributes,
+    ModelCreationAttributes,
+    ModelOptionalAttributes,
+    PaginateOptions,
+    Paginated,
+
+    ModelWithPolymorphicParent
+} from './types';
+import type { Models } from '@/types/Models';
 
 // Exceptions
 import { NotImplementedMethodException } from '@/Exceptions/Common'
@@ -28,8 +37,11 @@ import { NotImplementedMethodException } from '@/Exceptions/Common'
  * Base Model class
  */
 abstract class Model<
-    TModelAttributes extends {} = any,
-    TCreationAttributes extends {} = TModelAttributes
+    TModelAttributes extends ModelAttributes = any,
+    TCreationAttributes extends ModelCreationAttributes<
+        ModelAttributes,
+        ModelOptionalAttributes
+    > = any
 > extends SequelizeModel<
     TModelAttributes,
     TCreationAttributes
@@ -51,6 +63,9 @@ abstract class Model<
     @Column(DataType.DATE)
     declare public readonly updatedAt: Date;
 
+    public parentId?: string
+    public parentKey?: string
+
     // Properties =============================================================
     /**
      * Self getter to base class Model access child sattic methods
@@ -63,7 +78,6 @@ abstract class Model<
 
     /**
      * Array of keys to exclude in response toJSON method
-     * @override
      */
     protected hidden: (keyof TModelAttributes)[] = []
 
@@ -81,7 +95,7 @@ abstract class Model<
      * The _id primary key prefix
      */
     public get _prefix(): string {
-        return this.constructor.name.toLowerCase()
+        return this.constructor.name
     }
 
     // ------------------------------------------------------------------------
@@ -90,7 +104,7 @@ abstract class Model<
      * The _id primary key prefix
      */
     public static get _prefix(): string {
-        return this.constructor.name.toLowerCase()
+        return this.constructor.name
     }
 
     // Instance Methods =======================================================
@@ -117,16 +131,10 @@ abstract class Model<
     }
 
     // Static Methods =========================================================
-    /**
-     * Fixed relations includes
-     * @returns {Includeable[]} An array of fixed includeble relations
-     * @override
-     */
-    protected static fixedRelations(): Includeable[] {
-        return []
+    // Publics ----------------------------------------------------------------
+    public static sepId(id: string): [keyof Models, string] {
+        return id.split('_') as [keyof Models, string]
     }
-
-    // ------------------------------------------------------------------------
 
     /**
      * 
@@ -162,6 +170,16 @@ abstract class Model<
             data,
             pagination
         }
+    }
+
+    // Protecteds -------------------------------------------------------------
+    /**
+     * Fixed relations includes
+     * @returns {Includeable[]} An array of fixed includeble relations
+     * @override
+     */
+    protected static fixedRelations(): Includeable[] {
+        return []
     }
 
     // -- Privates ------------------------------------------------------------
@@ -208,6 +226,18 @@ abstract class Model<
 
     // ------------------------------------------------------------------------
 
+    @BeforeValidate
+    protected static handleOwnerKey(
+        instance: Model
+    ) {
+        if (instance.parentId) {
+            const [key] = this.sepId(instance.parentId)
+            instance.parentKey = key
+        }
+    }
+
+    // ------------------------------------------------------------------------
+
     /**
      * Handle ID of the instances if not exists
      * @param {Model[]} instances - Model instances 
@@ -248,5 +278,6 @@ export {
 }
 
 export type {
-    ModelAttributes
+    ModelAttributes,
+    ModelCreationAttributes
 }

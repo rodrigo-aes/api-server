@@ -1,6 +1,8 @@
 import Log from "@/utils/Log";
 import Str from "@/utils/Str";
-import AppURL from "@/utils/URL";
+import AppURL from "@/utils/AppURL";
+import AppDate from "@/utils/AppDate";
+import AppCache from "@/utils/AppCache";
 
 class AppGlobalContext {
     constructor() {
@@ -11,6 +13,8 @@ class AppGlobalContext {
         globalThis.Log = Log
         globalThis.Str = Str
         globalThis.AppURL = AppURL
+        globalThis.AppDate = AppDate
+        globalThis.AppCache = AppCache
     }
 }
 

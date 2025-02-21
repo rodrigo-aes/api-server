@@ -3,7 +3,6 @@ import '@/utils/Environment'
 import '@/utils/AppSource'
 import '@/utils/UncaughtExceptionHandler'
 import MySQL, { diedMySQL } from '@/database/MySQL'
-
 import {
     ServerAccessDatabase
 } from '@/database/Redis'

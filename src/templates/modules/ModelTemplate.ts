@@ -38,15 +38,14 @@ export default class ModelTemplate extends ModuleTemplate {
 
     protected types(): string {
         return `
-            import type { ModelAttributes } from "@/models/Model"
-            import type { Optional } from "sequelize"
+            import type { ModelAttributes, ModelCreationAttributes } from "@/models/Model"
 
             export interface ${this.className}Attributes extends ModelAttributes { }
 
-            export type ${this.className}CreationAttributes = Optional<${this.className}Attributes, (
-                'createdAt' |
-                'updatedAt'
-            )>
+            export type ${this.className}CreationAttributes = ModelCreationAttributes<
+                ${this.className}Attributes,
+                undefined
+            >
         `
     }
 }

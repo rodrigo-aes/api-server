@@ -89,7 +89,9 @@ export class ModelSource {
             "",
             "export type Models = {",
             models.map((name) => `    ${name}: typeof ${name};`).join("\n"),
-            "};"
+            "};",
+            '\n',
+            'export type PolymorphicRelationParentKey = keyof Models'
         ].join("\n");
     }
 }

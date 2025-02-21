@@ -1,8 +1,10 @@
 node_modules
 dist
+certs
 
 .env
 .env.development
 .env.production
 
 *.code-workspace
+

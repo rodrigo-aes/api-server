@@ -2,9 +2,7 @@
 import RequestContext from "@/contexts/RequestContext"
 
 // Config
-import authConfig, {
-    type AuthConfig
-} from "@/config/auth"
+import authConfig, { type AuthConfig } from "@/config/auth"
 
 // Types
 import type Authenticable from "./Authenticable"
@@ -14,6 +12,9 @@ import type {
 
     AuthData
 } from "./types"
+
+// Exceptions
+import { MissingAuthenticatedException } from "@/Exceptions/Auth"
 
 type SourceKey = keyof AuthConfig['sources']
 
@@ -35,6 +36,26 @@ class Auth {
         this.authenticated = authenticated
     }
 
+    // Instance Methods =======================================================
+    // Publics ----------------------------------------------------------------
+    /**
+     * Refresh the authenticated auth token
+     * @returns {Promise<AuthData>} - A object containing auth data
+     */
+    public async refresh(): Promise<AuthData> {
+        return this.authenticated.refreshAuth()
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Expire the current authenticated token
+     * @returns {Promise<void>}
+     */
+    public logout(): Promise<void> {
+        return this.authenticated.removeAuth()
+    }
+
     // Static Methods =========================================================
     // Publics ----------------------------------------------------------------
     /**
@@ -43,7 +64,7 @@ class Auth {
      * @param {SourceKey} source - Authenticable source name
      * @returns {this} - `this` with selected source
      */
-    public static source(source: SourceKey) {
+    public static source(source: SourceKey): typeof Auth {
         this._source = authConfig.sources[source]().model
         this.sourceKey = source
         return this
@@ -56,11 +77,13 @@ class Auth {
      * 
      * @param {AuthCrendentials} credentials - A object containing `credential`
      * identifier, `password` and `remember` boolean
-     * @returns Auth object data case success and `null` case fail 
+     * @returns {Promise<AuthData | null>} Auth object data case success and 
+     * `null` case fail 
      */
-    public static async attempt(
-        { credential, password, remember }: AuthCrendentials
-    ): Promise<AuthData | null> {
+    public static async attempt(credentials: AuthCrendentials): Promise<
+        AuthData | null
+    > {
+        const { credential, password, remember } = credentials
         const authenticable = await this.findSource(credential)
 
         if (authenticable) if (authenticable.verifyPassword(password)) {
@@ -74,6 +97,52 @@ class Auth {
         }
 
         return null
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Authenticate a autheticable entity
+     * 
+     * @param {Authenticable} authenticable - Authenticable entity
+     * @param {boolean} remember - Boolean represeting should remember TTL
+     * @default remember: false
+     * @returns {AuthData} - A object containing auth data
+     */
+    public static async authenticate(
+        authenticable: Authenticable,
+        remember: boolean = false
+    ): Promise<AuthData> {
+        const auth = await authenticable.authenticate(remember)
+        RequestContext.Auth = new Auth(authenticable)
+
+        return auth
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Refresh the authenticated auth token
+     * @returns {Promise<AuthData>} - A object containing auth data
+     */
+    public static refresh(): Promise<AuthData> {
+        if (!RequestContext.Auth) throw new MissingAuthenticatedException(
+            'Auth.refresh'
+        )
+        return RequestContext.Auth.refresh()
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Expire the current authenticated token
+     * @returns {Promise<void>}
+     */
+    public static logout(): Promise<void> {
+        if (!RequestContext.Auth) throw new MissingAuthenticatedException(
+            'Auth.logout'
+        )
+        return RequestContext.Auth.logout()
     }
 
     // Privates ---------------------------------------------------------------

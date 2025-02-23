@@ -55,7 +55,7 @@ export default class Server {
     // ------------------------------------------------------------------------
 
     private defineContexts() {
-        this.app.use((req, _, next) => RequestContext.apply(req, next))
+        this.app.use((req, res, next) => RequestContext.apply(req, res, next))
     }
 
     // ------------------------------------------------------------------------

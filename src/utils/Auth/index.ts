@@ -83,6 +83,16 @@ class Auth {
 
     // ------------------------------------------------------------------------
 
+    public static user<T extends Authenticable = DefaultSource>(): T {
+        if (!RequestContext.Auth) throw new MissingAuthenticatedException(
+            'Auth.user'
+        )
+
+        return RequestContext.Auth.user<T>()
+    }
+
+    // ------------------------------------------------------------------------
+
     /**
      * Attempt to authenticate user
      * 

@@ -3,6 +3,9 @@ import { Request, Response, NextFunction } from "express";
 // Contexts
 import RequestContext from "@/contexts/RequestContext";
 
+// Exceptions
+import { HttpResponseException } from "@/Exceptions/Request";
+
 export default abstract class Middleware {
     protected req!: Request
     protected res!: Response
@@ -16,6 +19,19 @@ export default abstract class Middleware {
         if (this.shouldSkip()) return this.next()
 
         return this.handle()
+    }
+
+    // ========================================================================
+
+    public async runOutOfContext(req: Request, res: Response): Promise<true> {
+        this.req = req
+        this.res = res
+        this.next = () => undefined
+
+        const response = await this.handle()
+        if (response) throw new HttpResponseException(response)
+
+        return true
     }
 
     // ========================================================================

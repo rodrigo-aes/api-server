@@ -1,8 +1,10 @@
 import Redis from "./Redis";
 
+import redisConfig from "@/config/redis"
+
 class ServerAccessDatabase extends Redis {
     constructor() {
-        super(process.env.REDIS_SERVER_ACCESS as string)
+        super(redisConfig.serverAccessDatabase.index)
     }
 }
 

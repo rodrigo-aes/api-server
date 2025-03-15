@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from "async_hooks"
 import { Request, Response, NextFunction } from "express"
 import type { RequestContextMap } from "./types"
 import type Auth from "@/utils/Auth"
+import type Signature from "@/utils/Signature"
 
 /**
  * RequestContext instance apply a AsyncLocalStorage context to request async
@@ -69,9 +70,21 @@ class RequestContext extends AsyncLocalStorage<RequestContextMap> {
         return this.getStore()!.Auth
     }
 
+    // ------------------------------------------------------------------------
+
+    public get signature(): Signature | undefined | null {
+        return this.req.signature
+    }
+
     // Setters ================================================================
     public set Auth(auth: Auth) {
         this.getStore()!.Auth = auth
+    }
+
+    // ------------------------------------------------------------------------
+
+    public set signature(signature: Signature) {
+        this.req.signature = signature
     }
 }
 

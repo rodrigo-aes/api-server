@@ -1,4 +1,5 @@
 import type Model from "@/models/Model"
+import type Signature from "@/utils/Signature"
 
 declare global {
     namespace Express {
@@ -10,6 +11,8 @@ declare global {
             validated: {
                 [key: string]: any
             }
+
+            signature?: Signature
         }
     }
 }

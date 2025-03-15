@@ -1,3 +1,38 @@
 import { URL } from "url"
+import Signature, { type MakeMap } from "@/utils/Signature"
 
-export default class AppURL extends URL { }
+import RequestContext from "@/contexts/RequestContext"
+
+export default class AppURL extends URL {
+    private queryParamLen = '?signature='.length
+    public signature: string | null
+
+    constructor(
+        input: string = RequestContext.req.originalUrl,
+        base: string =
+            `${RequestContext.req.protocol}://${RequestContext.req.get("host")}`
+    ) {
+        super(input, base)
+
+        this.signature = this.searchParams.get('signature')
+    }
+
+    // Instance Methods =======================================================
+    // Publics ----------------------------------------------------------------
+    public async sign({ length = 255, ...map }: MakeMap): Promise<void> {
+        length -= (this.href.length + this.queryParamLen)
+        const signature = await Signature.make({ length, ...map })
+
+        this.searchParams.append('signature', signature.signature)
+    }
+
+    // Static Methods =========================================================
+    public static async hasValidSignature(): Promise<Signature | null> {
+        const url = new AppURL
+        const signature = url.signature
+            ? await Signature.verify(url.signature)
+            : null
+
+        return signature
+    }
+}

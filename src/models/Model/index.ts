@@ -11,14 +11,23 @@ import {
     BeforeValidate,
     BeforeBulkCreate,
     BeforeSync,
-    AfterSync
+    AfterSync,
+    AfterFind,
+    AfterCreate
 } from 'sequelize-typescript'
 
 import RequestContext from '@/contexts/RequestContext';
 import Pagination from './Pagination';
 
 // Types
-import type { ModelStatic, Includeable, FindOptions } from 'sequelize'
+import type {
+    ModelStatic,
+    Includeable,
+    IncludeOptions,
+    FindOptions,
+    CreateOptions
+} from 'sequelize'
+
 import type {
     ModelAttributes,
     ModelCreationAttributes,
@@ -53,18 +62,16 @@ abstract class Model<
     @AllowNull(false)
     @PrimaryKey
     @Column(DataType.STRING)
-    public _id!: string;
+    declare public _id: string;
 
     @CreatedAt
-    @Column(DataType.DATE)
     declare public readonly createdAt: Date;
 
     @UpdatedAt
-    @Column(DataType.DATE)
     declare public readonly updatedAt: Date;
 
-    public parentId?: string
-    public parentKey?: string
+    declare public parentId?: string
+    declare public parentKey?: string
 
     // Properties =============================================================
     /**
@@ -79,7 +86,10 @@ abstract class Model<
     /**
      * Array of keys to exclude in response toJSON method
      */
-    protected hidden: (keyof TModelAttributes)[] = []
+    protected _hidden: (keyof TModelAttributes)[] = []
+    protected get hidden(): (keyof TModelAttributes)[] {
+        return this._hidden
+    }
 
     // -- Getters -------------------------------------------------------------
     /**
@@ -104,16 +114,17 @@ abstract class Model<
      * The _id primary key prefix
      */
     public static get _prefix(): string {
-        return this.constructor.name
+        return this.prototype.constructor.name
     }
 
     // Instance Methods =======================================================
+    // Publics ----------------------------------------------------------------
     /**
      * Returns a JSON object with model fields and omit the fields passed
      * in hidden prop
      * @returns {TModelAttributes} - A JSON object with model fields and hidden
      */
-    public override toJSON() {
+    public override toJSON(): TModelAttributes {
         const json = super.toJSON()
         this.hidden.forEach(key => delete json[key])
 
@@ -126,8 +137,40 @@ abstract class Model<
      * Fill the fields with value passed in data param
      * @param {TModelAttributes} data - A object containing data to fill
      */
-    public fill(data: TModelAttributes) {
+    public fill(data: Partial<TModelAttributes>) {
         Object.assign(this, data)
+        Object.assign(this.dataValues, data)
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Set a model value on instance key and datavalues key
+     * 
+     * @param {keyof TModelAttributes} key - key to set
+     * @param {any} value - Value to set 
+     */
+    public setValue(key: keyof TModelAttributes, value: any) {
+        this.fill({
+            [key]: value
+        } as Partial<TModelAttributes>)
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Push a instance of related model to instance relation array
+     * 
+     * @param {keyof TModelAttributes} key - Key of relation
+     * @param {Related} related - A instance of relation to push in array
+     */
+    public push<Related extends Model>(
+        key: keyof TModelAttributes,
+        related: Related
+    ) {
+        this.setValue(key,
+            [...(this[key as keyof this] as Model[] ?? []), related]
+        )
     }
 
     // Static Methods =========================================================
@@ -135,6 +178,8 @@ abstract class Model<
     public static sepId(id: string): [keyof Models, string] {
         return id.split('_') as [keyof Models, string]
     }
+
+    // ------------------------------------------------------------------------
 
     /**
      * 
@@ -176,9 +221,8 @@ abstract class Model<
     /**
      * Fixed relations includes
      * @returns {Includeable[]} An array of fixed includeble relations
-     * @override
      */
-    protected static fixedRelations(): Includeable[] {
+    protected static fixedRelations(): IncludeOptions[] {
         return []
     }
 
@@ -199,6 +243,24 @@ abstract class Model<
         return parseInt(queryPage ?? '1')
     }
 
+    // ------------------------------------------------------------------------
+
+    private static mergeIncludeable(
+        includes: IncludeOptions[],
+        override: IncludeOptions[]
+    ): IncludeOptions[] {
+        for (const include of override) {
+            const index = includes.findIndex(
+                original => original.as === include.as
+            )
+
+            if (index > -1) includes.splice(index, 1, include)
+            else includes.push(include)
+        }
+
+        return includes
+    }
+
     // Hooks ==================================================================
     /**
      * Add the fixed relations to consult
@@ -206,11 +268,29 @@ abstract class Model<
      */
     @BeforeFind
     protected static includeFixedRelations(options: FindOptions<Model>) {
-        if (options.include) options.include = Array.isArray(options.include)
-            ? [...options.include, ...this.fixedRelations()]
-            : [options.include, ...this.fixedRelations()]
+        if (options.include) options.include = this.mergeIncludeable(
+            this.fixedRelations(),
+            (
+                Array.isArray(options.include)
+                    ? options.include
+                    : [options.include]
+            ) as IncludeOptions[]
+        )
 
         else options.include = this.fixedRelations()
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Fill the model instance data and data values with the same values
+     * @param {Model} instance - Model passed to sequelize 
+     */
+    @AfterFind
+    @AfterCreate
+    @BeforeValidate
+    protected static fillInstance(instance: Model) {
+        if (instance) instance.fill(instance.dataValues)
     }
 
     // ------------------------------------------------------------------------
@@ -221,7 +301,11 @@ abstract class Model<
      */
     @BeforeValidate
     protected static async handleId(instance: Model) {
-        if (!instance._id) instance._id = await this.genId()
+        if (!instance._id) {
+            const id = await this.genId()
+            instance._id = id
+            instance.dataValues._id = id
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -232,7 +316,7 @@ abstract class Model<
     ) {
         if (instance.parentId) {
             const [key] = this.sepId(instance.parentId)
-            instance.parentKey = key
+            instance.dataValues.parentKey = key
         }
     }
 
@@ -254,7 +338,9 @@ abstract class Model<
      */
     @BeforeSync
     protected static initSyncLog() {
-        Log.out(`#[warning]Syncronizing model #[info]${this.self.name}#[warning]...`)
+        Log.out(
+            `#[warning]Syncronizing model #[info]${this.self.name}#[warning]...`
+        )
     }
 
     // ------------------------------------------------------------------------
@@ -264,7 +350,9 @@ abstract class Model<
      */
     @AfterSync
     protected static syncSuccessLog() {
-        Log.out(`#[info]${this.self.name} #[success]model syncronized sucessfuly!`)
+        Log.out(
+            `#[info]${this.self.name} #[success]model syncronized sucessfuly!`
+        )
         Log.out('')
     }
 }
@@ -272,6 +360,7 @@ abstract class Model<
 export default Model
 
 import { StaticSelf } from './Decorators'
+import { object } from 'zod';
 
 export {
     StaticSelf

@@ -4,7 +4,10 @@ import Log from "@/utils/Log";
 // Templates
 import {
     CommandTemplate,
-    ModelTemplate
+    ModelTemplate,
+    ControllerTemplate,
+    RequestTemplate,
+    MiddlewareTemplate,
 } from '@/templates'
 
 // Decorators
@@ -12,7 +15,10 @@ import { ProccessLog } from "@/commands/Decorators";
 
 type ModuleType = (
     'command' |
-    'model'
+    'model' |
+    'controller' |
+    'request' |
+    'middleware'
 )
 
 export default class Create extends Command {
@@ -35,6 +41,22 @@ export default class Create extends Command {
             'Force override of existente module.',
             false
         )
+
+        this.option(
+            '--api',
+            'Create a controller with API template',
+            false
+        )
+
+        this.option(
+            '--controller <value>',
+            'Include target controller to request',
+        )
+
+        this.option(
+            '--method <value>',
+            'Include method name to request'
+        )
     }
 
     // ========================================================================
@@ -49,6 +71,15 @@ export default class Create extends Command {
                 break
 
             case "model": this.createNewModel()
+                break
+
+            case 'controller': this.createNewController()
+                break
+
+            case 'request': this.createNewRequest()
+                break
+
+            case 'middleware': this.createNewMiddleware()
                 break
         }
     }
@@ -75,7 +106,7 @@ export default class Create extends Command {
         this.path = path.join('/')
     }
 
-    // =======================================================================
+    // ========================================================================
 
     private createNewCommand() {
         new CommandTemplate({
@@ -85,13 +116,46 @@ export default class Create extends Command {
         }).putFile()
     }
 
-    // =======================================================================
+    // ========================================================================
 
     private createNewModel() {
         new ModelTemplate({
             className: this.className,
             path: this.path,
             forceOverride: this.opts().forceOverride
+        }).putFile()
+    }
+
+    // ========================================================================
+
+    private createNewController() {
+        new ControllerTemplate({
+            className: this.className,
+            path: this.path,
+            forceOverride: this.opts().forceOverride,
+            api: this.opts().api
+        }).putFile()
+    }
+
+    // ========================================================================
+
+    private createNewRequest() {
+        new RequestTemplate({
+            className: this.className,
+            path: this.path,
+            forceOverride: this.opts().forceOverride,
+            controller: this.opts().controller,
+            method: this.opts().method
+        }).putFile()
+    }
+
+    // ========================================================================
+
+    private createNewMiddleware() {
+        new MiddlewareTemplate({
+            className: this.className,
+            path: this.path,
+            forceOverride: this.opts().forceOverride,
         }).putFile()
     }
 }

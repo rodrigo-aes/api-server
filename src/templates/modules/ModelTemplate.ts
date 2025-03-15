@@ -1,5 +1,4 @@
-import ModuleTemplate from "./ModuleTemplate"
-import type { ModuleTemplateArgs } from "./ModuleTemplate"
+import ModuleTemplate, { type ModuleTemplateArgs } from "./ModuleTemplate"
 
 export default class ModelTemplate extends ModuleTemplate {
     public base: string = 'src/models'

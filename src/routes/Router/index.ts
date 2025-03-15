@@ -3,6 +3,8 @@ import {
     type RequestHandler,
 } from "express";
 
+import Request, { type RequestConstructor } from "@/requests/Request"
+
 import type {
     RouterDefinitionFn,
     MiddlewareArg,
@@ -37,26 +39,38 @@ export default class Router {
 
     // ========================================================================
 
-    public get(path: string, ...handlers: RequestHandler[]) {
-        this.router.get(path, ...handlers)
+    public get(
+        path: string,
+        ...handlers: (RequestConstructor | RequestHandler)[]
+    ) {
+        this.router.get(path, ...this.makeHandlers(...handlers))
     }
 
     // ========================================================================
 
-    public post(path: string, ...handlers: RequestHandler[]) {
-        this.router.get(path, ...handlers)
+    public post(
+        path: string,
+        ...handlers: (RequestConstructor | RequestHandler)[]
+    ) {
+        this.router.post(path, ...this.makeHandlers(...handlers))
     }
 
     // ========================================================================
 
-    public put(path: string, ...handlers: RequestHandler[]) {
-        this.router.get(path, ...handlers)
+    public put(
+        path: string,
+        ...handlers: (RequestConstructor | RequestHandler)[]
+    ) {
+        this.router.put(path, ...this.makeHandlers(...handlers))
     }
 
     // ========================================================================
 
-    public delete(path: string, ...handlers: RequestHandler[]) {
-        this.router.get(path, ...handlers)
+    public delete(
+        path: string,
+        ...handlers: (RequestConstructor | RequestHandler)[]
+    ) {
+        this.router.delete(path, ...this.makeHandlers(...handlers))
     }
 
     // ========================================================================
@@ -102,6 +116,26 @@ export default class Router {
 
         define(router)
         this.use(path, router)
+    }
+
+    // ========================================================================
+
+    public makeHandlers(
+        ...handlers: (RequestConstructor | RequestHandler)[]
+    ): RequestHandler[] {
+        let h: RequestHandler[] = []
+
+        for (const handler of handlers) {
+            if (Request.prototype?.isPrototypeOf(handler.prototype))
+                h = [
+                    ...h,
+                    ...new (handler as RequestConstructor)().requestHandlers()
+                ]
+            else h.push(handler as RequestHandler)
+        }
+
+
+        return h
     }
 
     // ========================================================================

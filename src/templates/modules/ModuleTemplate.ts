@@ -28,6 +28,7 @@ export default abstract class ModuleTemplate {
         this.makeDestFolder(path)
         this.createFile(dest)
         this.createTypes(dest)
+        this.createInterface(dest)
     }
 
     // ========================================================================
@@ -83,6 +84,16 @@ export default abstract class ModuleTemplate {
 
     // ========================================================================
 
+    private createInterface(dest: string) {
+        const content = this.interface()
+        if (content) writeFileSync(
+            `${dest}/${this.className}.interface.ts`,
+            Str.dedent(content)
+        )
+    }
+
+    // ========================================================================
+
     /**
      * The content string of the main module file
      */
@@ -93,9 +104,18 @@ export default abstract class ModuleTemplate {
     /**
      * The content of the module types in package
      * @returns {string | null} - A string with the content or null
-     * @override
      */
     protected types(): string | null {
+        return null
+    }
+
+    // ========================================================================
+
+    /**
+     * The content of the module interface in package
+     * @returns {string | null} - A string with the content or null
+     */
+    protected interface(): string | null {
         return null
     }
 }

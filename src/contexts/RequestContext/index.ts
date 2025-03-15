@@ -18,17 +18,23 @@ class RequestContext extends AsyncLocalStorage<RequestContextMap> {
      * @returns {void} - `void`
      */
     public apply(req: Request, res: Response, next: NextFunction): void {
-        return super.run(this.initMap(req, res), next)
+        return super.run(this.initMap(req, res, next), next)
     }
 
     // ------------------------------------------------------------------------
 
-    private initMap(req: Request, res: Response): RequestContextMap {
+    private initMap(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): RequestContextMap {
         req.targets = {}
+        req.validated = {}
 
         return {
             req,
             res,
+            next,
             Auth: null,
             skip: []
         }
@@ -43,6 +49,12 @@ class RequestContext extends AsyncLocalStorage<RequestContextMap> {
 
     public get res() {
         return this.getStore()!.res
+    }
+
+    // ------------------------------------------------------------------------
+
+    public get next() {
+        return this.getStore()!.next
     }
 
     // ------------------------------------------------------------------------

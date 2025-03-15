@@ -20,21 +20,16 @@ class UncaughtExceptionHandler {
     public handleException(error: Error): void {
         switch (process.env.NODE_ENV) {
             case 'production': return
-            default: this.testAmbientHandler(error)
+            default:
+                const shouldIgnore = (
+                    error instanceof HttpResponseException
+                )
+
+                if (shouldIgnore) return
+
+                console.log(error)
+                throw error
         }
-    }
-
-    private testAmbientHandler(error: Error) {
-        if (this.shouldIgnore(error)) return
-
-        console.log(error)
-        throw error
-    }
-
-    private shouldIgnore(error: Error) {
-        return (
-            error instanceof HttpResponseException
-        )
     }
 }
 

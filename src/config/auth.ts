@@ -11,7 +11,7 @@ const authConfig = {
         User: () => ({
             model: User,
             credentialProps: {
-                username: (value: string) => true
+                username: (_: string) => true
             },
             credentialRelations: [
                 {
@@ -25,7 +25,7 @@ const authConfig = {
                     model: Phone,
                     as: 'phones',
                     props: {
-                        complete: (value: string) => true
+                        complete: (value: string) => value.startsWith('+')
                     }
                 }
             ]

@@ -3,9 +3,26 @@ import type {
     AuthenticableCreationAttibutes
 } from "@/utils/Auth/types"
 
-export interface UserAttributes extends AuthenticableAttributes { }
+// Relations
+import type Email from "../Email"
+import type Phone from "../Phone"
+
+export interface UserAttributes extends AuthenticableAttributes {
+    username: string
+
+    emails: Email[]
+    phones: Phone[]
+}
 
 export type UserCreationAttributes = AuthenticableCreationAttibutes<
     UserAttributes,
-    undefined
+    (
+        'emails' |
+        'phones'
+    )
 >
+
+export interface UserStoreAtrributes extends UserCreationAttributes {
+    email: string
+    phone: string
+}

@@ -6,14 +6,18 @@ import authConfig, {
     type AuthConfig
 } from "@/config/auth"
 
+import { Op } from "sequelize"
+
 // Types
-import type Authenticable from "./Authenticable"
+import Authenticable from "./Authenticable"
 import type {
     AuthCrendentials,
     AuthenticableStatic,
 
     AuthData
 } from "./types"
+
+import type { Includeable, WhereAttributeHash } from "sequelize"
 
 // Exceptions
 import { MissingAuthenticatedException } from "@/Exceptions/Auth"
@@ -75,7 +79,7 @@ class Auth {
      * @param {SourceKey} source - Authenticable source name
      * @returns {this} - `this` with selected source
      */
-    public static source(source: SourceKey): typeof Auth {
+    public static source(source: SourceKey = this.sourceKey): typeof Auth {
         this._source = authConfig.sources[source]().model
         this.sourceKey = source
         return this
@@ -118,6 +122,44 @@ class Auth {
         }
 
         return null
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Verify if the request authorization header contains a valid Bearer token
+     * 
+     * @returns {Promise<Authenticable | null>} - A autheticable entity
+     * instance or `null`
+     */
+    public static async verify(): Promise<Authenticable | null> {
+        const token = this.parseBearer()
+        if (!token) return null
+
+        const authenticable = await Authenticable.verify(token)
+        if (!authenticable) return null
+
+        RequestContext.Auth = new Auth(authenticable)
+
+        return authenticable
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Parse the request authorization header and returna a Bearer token
+     * 
+     * @returns {string | null} - A token string or `null`
+     */
+    public static parseBearer(): string | null {
+        const auth = RequestContext.req.headers.authorization
+        if (!auth) return null
+
+        const [prefix, token] = auth.split(' ')
+        if (prefix !== 'Bearer') return null
+        if (!token) return null
+
+        return token
     }
 
     // ------------------------------------------------------------------------
@@ -168,32 +210,52 @@ class Auth {
 
     // Privates ---------------------------------------------------------------
     private static async findSource(credential: string) {
-        const credentials = this.getCrendentials(credential)
-        const where: any = {}
-        for (const cred of credentials) where[cred] = credential
+        const [locals, relations] = this.getCrendentials(credential)
 
-        return this._source.findOne({
+        const where = (locals.length > 0)
+            ? locals[0]
+            : null
+
+        let authenticalble: Authenticable | null = null
+
+        if (where) authenticalble = await this._source.findOne({
             where
         })
+
+        if (authenticalble) return authenticalble
+
+        for (const include of relations) {
+            authenticalble = await this._source.findOne({
+                include,
+            })
+
+            if (authenticalble) return authenticalble
+        }
+
+        return null
     }
 
     // ------------------------------------------------------------------------
 
-    private static getCrendentials(credential: string) {
+    private static getCrendentials(credential: string): [
+        WhereAttributeHash[], Includeable[]
+    ] {
         const credentialProps = this.getCredentialProps(credential)
         const credentialRelations = this.getCredentialRelations(credential)
 
-        return [...credentialProps, ...credentialRelations]
+        return [credentialProps, credentialRelations]
     }
 
     // ------------------------------------------------------------------------
 
     private static getCredentialProps(credential: string) {
         const creds = authConfig.sources[this.sourceKey]().credentialProps
-        const props: string[] = []
+        const props: WhereAttributeHash[] = []
 
         for (const key in creds)
-            if (creds[key as keyof typeof creds](credential)) props.push(key)
+            if (creds[key as keyof typeof creds](credential)) props.push({
+                [key]: credential
+            })
 
         return props
     }
@@ -202,12 +264,28 @@ class Auth {
 
     private static getCredentialRelations(credential: string) {
         const creds = authConfig.sources[this.sourceKey]().credentialRelations
-        const relations: string[] = []
-
+        const relations: Includeable[] = []
         for (const cred of creds) {
-            for (const key in cred.props)
-                if (cred.props[key as keyof typeof cred.props]!(credential))
-                    relations.push(`$${cred.as}.${key}$`)
+            const or = []
+
+            for (const prop in cred.props) {
+                const include = cred.props[prop as keyof typeof cred.props]!(
+                    credential
+                )
+
+                if (include) or.push({
+                    [prop]: credential
+                })
+            }
+
+            relations.push({
+                model: cred.model,
+                as: cred.as,
+                where: {
+                    [Op.or]: or
+                },
+                required: true
+            })
         }
 
         return relations
@@ -215,3 +293,5 @@ class Auth {
 }
 
 export default Auth
+
+export type AuthSourceKey = SourceKey

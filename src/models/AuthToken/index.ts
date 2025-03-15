@@ -30,44 +30,44 @@ class AuthToken extends Model<
 > {
     @AllowNull(false)
     @Column(DataType.STRING)
-    public authenticableId!: string
+    declare public authenticableId: string
 
     @AllowNull(true)
     @Column(DataType.STRING)
-    public deviceId!: string | null
+    declare public deviceId: string | null
 
     @AllowNull(false)
     @Column(DataType.STRING)
-    public sourceKey!: keyof AuthConfig['sources']
+    declare public sourceKey: keyof AuthConfig['sources']
 
     @Default('Bearer')
     @AllowNull(false)
     @Column(DataType.ENUM('Bearer'))
-    public type!: 'Bearer'
+    declare public type: 'Bearer'
 
     @AllowNull(false)
     @Unique
     @Column(DataType.STRING)
-    public jwtid!: string
+    declare public jwtid: string
 
     @AllowNull(false)
     @Column(DataType.STRING)
-    public ip!: string
+    declare public ip: string
 
     @Default(false)
     @AllowNull(false)
     @Column(DataType.BOOLEAN)
-    public remember!: boolean
+    declare public remember: boolean
 
     @AllowNull(false)
     @Column(DataType.DATE)
-    public expireAt!: Date
+    declare public expireAt: Date
 
     public authenticable: Authenticable | null = null
 
     // Properties =============================================================
     // Protecteds -------------------------------------------------------------
-    protected hidden: (keyof AuthTokenAttributes)[] = [
+    protected _hidden: (keyof AuthTokenAttributes)[] = [
         '_id',
         'authenticableId',
         'ip',
@@ -92,7 +92,7 @@ class AuthToken extends Model<
         const authenticable = (await source.findByPk(this.authenticableId))!
 
         const jwtid = Str.random(255)
-        const token = JWT.sign(authenticable, jwtid, this.remember)
+        const token = JWT.sign(authenticable.toJSON(), jwtid, this.remember)
 
         this.jwtid = jwtid
         this.expireAt = AuthToken.handleExpireAt(this.remember)
@@ -133,10 +133,11 @@ class AuthToken extends Model<
             'sources'
         ]
 
-        const instance = await super.create<AuthToken>({
+        const instance = await this.create({
             authenticableId: authenticable._id,
             sourceKey,
-            jwtid
+            jwtid,
+            remember,
         })
 
         return {
@@ -176,8 +177,13 @@ class AuthToken extends Model<
     }
 
     // ------------------------------------------------------------------------
-
-    public static findByJwtId(jwtid: string) {
+    /**
+     * Search a instance with unique jwtid
+     * @param {string} jwtid - JWT ID 
+     * @returns {Promise<AuthToken | null>} - A instance of AuthToken case
+     * exists and `null` case inexistent
+     */
+    public static findByJwtId(jwtid: string): Promise<AuthToken | null> {
         return this.findOne({
             where: { jwtid }
         })
@@ -203,8 +209,10 @@ class AuthToken extends Model<
     // Hook ===================================================================
     @BeforeValidate
     protected static handleAttributes(instance: AuthToken) {
-        instance.ip = this.getRequestIP()
-        instance.expireAt = this.handleExpireAt(instance.remember)
+        instance.fill({
+            ip: this.getRequestIP(),
+            expireAt: this.handleExpireAt(instance.remember)
+        })
     }
 }
 

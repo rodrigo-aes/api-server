@@ -6,6 +6,10 @@ declare global {
             targets: {
                 [key: string]: Model
             }
+
+            validated: {
+                [key: string]: any
+            }
         }
     }
 }

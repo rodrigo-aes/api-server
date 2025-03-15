@@ -5,6 +5,9 @@ import {
     DataType,
     Unique,
     AllowNull,
+    PrimaryKey,
+    CreatedAt,
+    UpdatedAt,
 
     // Relations
     BelongsTo,
@@ -40,33 +43,27 @@ class Email extends Model<EmailAttributes, EmailCreationAttributes> {
         },
         constraints: false,
         foreignKeyConstraint: false,
-
-        onDelete: 'CASCADE'
     })
     public user?: User
 
     @AllowNull(false)
     @Unique
     @Column(DataType.STRING)
-    public address!: string
+    declare public address: string
 
     @AllowNull(false)
     @Column(DataType.STRING)
-    public local!: string
+    declare public local: string
 
     @AllowNull(false)
     @Column(DataType.STRING)
-    public domain!: string
+    declare public domain: string
 
     // Static Methods =========================================================
     // Privates ---------------------------------------------------------------
     private static handleAddress(instance: Email) {
         const [local, domain] = instance.address.split('@')
-
-        Object.assign(instance, {
-            local,
-            domain
-        })
+        instance.fill({ local, domain })
     }
 
     // Hooks ==================================================================

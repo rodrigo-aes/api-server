@@ -27,6 +27,7 @@ import type {
 
 // Exceptions
 import { MissingAuthTokenException } from "@/Exceptions/Auth"
+import { NotImplementedMethodException } from "@/Exceptions/Common"
 
 /**
  * Authenticable class model - Extends this to make a model a authenticable
@@ -39,27 +40,32 @@ abstract class Authenticable<
         '_password'
     > = any
 > extends Model<TModelAttributes, TCreationAttributes> {
-    constructor() {
-        super();
-        this.mergeHidden()
-    }
-
+    // Columns ================================================================
     @AllowNull(false)
     @Column(DataType.STRING)
-    private _password!: string
+    declare public _password: string;
 
+    // Relations ==============================================================
     @HasMany(() => AuthToken, {
+        foreignKey: 'authenticableId',
         as: 'authTokens',
         constraints: false,
         foreignKeyConstraint: false,
-        onDelete: 'CASCADE',
-        foreignKey: 'authenticableId',
     })
-    public authTokens: AuthToken[] | null = null
+    public authTokens: AuthToken[] | null = null;
 
     // Properties =============================================================
     // Protecteds -------------------------------------------------------------
-    protected hidden: (keyof AuthenticableAttributes)[] = ['_password']
+    protected authenticableHidden: (keyof AuthenticableAttributes)[] = [
+        '_password'
+    ]
+
+    protected get hidden(): (keyof TModelAttributes)[] {
+        return [
+            ...this._hidden,
+            ...this.authenticableHidden
+        ]
+    }
 
     // Privates ---------------------------------------------------------------
     private authToken: AuthToken | null = null
@@ -137,20 +143,46 @@ abstract class Authenticable<
         return Hash.compare(password, this._password)
     }
 
-    // Privates ---------------------------------------------------------------
-    private mergeHidden() {
-        const childHidden = Reflect.get(this, 'hidden') ?? [];
+    // Static Methods =========================================================
+    // Publics ----------------------------------------------------------------
+    /**
+     * Register new Authenticavle entity on database
+     * 
+     * @param {any} data - Register authenticable data
+     */
+    public static register(data: any): Promise<Authenticable> {
+        throw new NotImplementedMethodException('register')
+    }
 
-        this.hidden = Array.from(new Set([
-            ...this.hidden,
-            ...childHidden,
-        ]));
+    // ------------------------------------------------------------------------
+
+    /**
+     * Veridy if is a valid token and returns the authenticable and auth token
+     * objects
+     * 
+     * @param {string} token - JWT token to verify
+     * @returns {{ instance: AuthToken, authenticable: Authenticable }} - A 
+     * object containing `AuthToken` and `Authenticable` instances case token
+     * is valid and `null` case invalid 
+     */
+    public static async verify(token: string): Promise<Authenticable | null> {
+        const auth = await AuthToken.verify(token)
+        if (!auth) return null
+
+        const { instance, authenticable } = auth
+
+        if (!authenticable.authTokens) authenticable.authTokens = []
+        authenticable.authTokens.push(instance)
+        authenticable.authToken = instance
+
+        return authenticable
     }
 
     // Hooks ==================================================================
     @BeforeCreate
     protected static hashPassword(instance: Authenticable): void {
-        instance._password = Hash.make(instance._password)
+        const _password = Hash.make(instance._password)
+        instance.fill({ _password })
     }
 }
 

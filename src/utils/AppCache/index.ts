@@ -35,7 +35,7 @@ class AppCache {
 
     private loadJWTPublicKey(): Buffer {
         this._jwtPublicKey = readFileSync(
-            resolve('/certs/JWT/public.pem')
+            resolve('certs/JWT/public.pem')
         )
 
         return this._jwtPublicKey

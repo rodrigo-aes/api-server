@@ -14,4 +14,9 @@ class Controller {
     }
 }
 
+export type ControllerContructor = new (
+    req: Request,
+    res: Response
+) => Controller
+
 export default Controller

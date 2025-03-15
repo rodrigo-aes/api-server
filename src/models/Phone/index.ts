@@ -38,26 +38,25 @@ class Phone extends Model<PhoneAttributes, PhoneCreationAttributes> {
         scope: {
             parentKey: 'User'
         },
-        onDelete: 'CASCADE'
     })
     public user!: User | null
 
     @AllowNull(false)
     @Unique
     @Column(DataType.STRING(64))
-    public complete!: string
+    declare public complete: string
 
     @AllowNull(false)
     @Column(DataType.STRING(16))
-    public countryCode!: string
+    declare public countryCode: string
 
     @AllowNull(false)
     @Column(DataType.STRING(16))
-    public areaCode!: string
+    declare public areaCode: string
 
     @AllowNull(false)
     @Column(DataType.STRING(32))
-    public number!: string
+    declare public number: string
 
     // @AllowNull(false)
     // @Column(DataType.STRING(64))
@@ -72,7 +71,7 @@ class Phone extends Model<PhoneAttributes, PhoneCreationAttributes> {
     private static splitParts(instance: Phone) {
         const [countryCode, areaCode, number] = instance.complete.split(' ')
 
-        Object.assign(instance, {
+        instance.fill({
             countryCode,
             areaCode,
             number,
@@ -80,6 +79,7 @@ class Phone extends Model<PhoneAttributes, PhoneCreationAttributes> {
     }
 
     // Hooks ==================================================================
+    @BeforeValidate
     protected static handleData(instance: Phone) {
         this.splitParts(instance)
     }

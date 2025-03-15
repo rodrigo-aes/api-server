@@ -38,6 +38,8 @@ const authConfig = {
     })
 }
 
+export const defaultAcceptedSources: (keyof AuthConfig['sources'])[] = ['User']
+
 export type AuthConfig = typeof authConfig
 
 export default authConfig

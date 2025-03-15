@@ -43,11 +43,11 @@ class Auth {
     }
 
     // Getters ================================================================
-    public get sourceKey(): string {
-        return this.authenticated.constructor.name.toLowerCase()
+    public get sourceKey(): SourceKey {
+        return this.authenticated.constructor.name as SourceKey
     }
 
-    public static get sourceKey(): string {
+    public static get sourceKey(): SourceKey {
         if (!RequestContext.Auth) throw new MissingAuthenticatedException(
             'sourceKey'
         )

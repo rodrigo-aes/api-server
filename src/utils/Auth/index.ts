@@ -33,13 +33,25 @@ class Auth {
     private static _default = authConfig.defaultSource().model
     private static _source: AuthenticableStatic = this._default
 
-    private static sourceKey: SourceKey = authConfig
+    private static _sourceKey: SourceKey = authConfig
         .defaultSource()
         .key as SourceKey
 
     // Contructor =============================================================
     private constructor(authenticated: Authenticable) {
         this.authenticated = authenticated
+    }
+
+    // Getters ================================================================
+    public get sourceKey(): string {
+        return this.authenticated.constructor.name.toLowerCase()
+    }
+
+    public static get sourceKey(): string {
+        if (!RequestContext.Auth) throw new MissingAuthenticatedException(
+            'sourceKey'
+        )
+        return RequestContext.Auth.sourceKey
     }
 
     // Instance Methods =======================================================
@@ -79,9 +91,9 @@ class Auth {
      * @param {SourceKey} source - Authenticable source name
      * @returns {this} - `this` with selected source
      */
-    public static source(source: SourceKey = this.sourceKey): typeof Auth {
+    public static source(source: SourceKey = this._sourceKey): typeof Auth {
         this._source = authConfig.sources[source]().model
-        this.sourceKey = source
+        this._sourceKey = source
         return this
     }
 
@@ -249,7 +261,7 @@ class Auth {
     // ------------------------------------------------------------------------
 
     private static getCredentialProps(credential: string) {
-        const creds = authConfig.sources[this.sourceKey]().credentialProps
+        const creds = authConfig.sources[this._sourceKey]().credentialProps
         const props: WhereAttributeHash[] = []
 
         for (const key in creds)
@@ -263,7 +275,7 @@ class Auth {
     // ------------------------------------------------------------------------
 
     private static getCredentialRelations(credential: string) {
-        const creds = authConfig.sources[this.sourceKey]().credentialRelations
+        const creds = authConfig.sources[this._sourceKey]().credentialRelations
         const relations: Includeable[] = []
         for (const cred of creds) {
             const or = []

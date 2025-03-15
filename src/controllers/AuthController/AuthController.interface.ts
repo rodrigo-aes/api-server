@@ -9,7 +9,22 @@ export interface AuthControllerInterface extends Controller {
     signIn(req: Request, res: Response): Promise<Response>
 
     /**
+     * Returns authenticated user
+     */
+    authenticated(req: Request, res: Response): Promise<Response>
+
+    /**
      * Register and authenticate a user
      */
     signUp(req: Request, res: Response): Promise<Response>
+
+    /**
+     * Refresh auth instance
+     */
+    refresh(req: Request, res: Response): Promise<Response>
+
+    /**
+     * Remove current auth instance
+     */
+    logout(req: Request, res: Response): Promise<Response>
 }

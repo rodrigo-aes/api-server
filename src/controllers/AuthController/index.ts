@@ -32,6 +32,18 @@ export default
 
     // ------------------------------------------------------------------------
 
+    public async authenticated(req: Request, res: Response) {
+        const source = Auth.sourceKey
+        const authenticated = Auth.user()
+
+        return res.json({
+            source,
+            authenticated
+        })
+    }
+
+    // ------------------------------------------------------------------------
+
     public async signUp(req: Request, res: Response) {
         const data = req.validated.signUp
         const user = await User.register(data)

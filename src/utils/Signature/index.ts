@@ -31,6 +31,20 @@ class Signature {
         )
     }
 
+    // ------------------------------------------------------------------------
+
+    public expireCaseStatus(status: number | number[]) {
+        RequestContext.req.on('close',
+            async () => {
+                const shoulExpire = typeof status === 'number'
+                    ? RequestContext.req.statusCode === status
+                    : status.includes(RequestContext.req.statusCode as number)
+
+                if (shoulExpire) await this.expire()
+            }
+        )
+    }
+
     // Privates ---------------------------------------------------------------
     public async initHandle(): Promise<void> {
         if (this.data.uniqueUse) this.expireOnClose()
@@ -50,10 +64,14 @@ class Signature {
             length = 255,
             exp,
             uniqueUse = false
-        }: MakeMap
+        }: MakeMap = {
+                data: {},
+                length: 255,
+                exp: undefined,
+                uniqueUse: false
+            }
     ): Promise<Signature> {
         const signature = await this.gen(length)
-
 
         if (exp) {
             const expireAt = new AppDate().add(exp)

@@ -10,6 +10,8 @@ import type Signature from "@/utils/Signature"
  * process available in all application locals inside the current request
  */
 class RequestContext extends AsyncLocalStorage<RequestContextMap> {
+    // Methods ================================================================
+    // Publics ----------------------------------------------------------------
     /**
      * Apply the context with AsyncLocalStorage to request async process
      * 
@@ -23,6 +25,17 @@ class RequestContext extends AsyncLocalStorage<RequestContextMap> {
     }
 
     // ------------------------------------------------------------------------
+
+    /**
+     * Verify if request has valid signature
+     * @returns {Promise<Signature | null>} - `Signature` instance case valid
+     * or `null` case invalid
+     */
+    public async hasValidSignature(): Promise<Signature | null> {
+        return await AppURL.hasValidSignature()
+    }
+
+    // Privates ---------------------------------------------------------------
 
     private initMap(
         req: Request,

@@ -19,14 +19,29 @@ export default class AppURL extends URL {
 
     // Instance Methods =======================================================
     // Publics ----------------------------------------------------------------
-    public async sign({ length = 255, ...map }: MakeMap): Promise<void> {
+    /**
+     * Sign URL
+     * 
+     * @param {MakeMap} map - Signature options map 
+     * @returns {this} - `this`
+     */
+    public async sign(
+        map: MakeMap = { length: 255 }
+    ): Promise<this> {
         length -= (this.href.length + this.queryParamLen)
         const signature = await Signature.make({ length, ...map })
 
         this.searchParams.append('signature', signature.signature)
+
+        return this
     }
 
     // Static Methods =========================================================
+    /**
+     * Verify if the current URL has a valid signature 
+     * 
+     * @returns 
+     */
     public static async hasValidSignature(): Promise<Signature | null> {
         const url = new AppURL
         const signature = url.signature

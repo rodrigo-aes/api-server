@@ -3,13 +3,10 @@ import '@/utils/Environment'
 import '@/utils/AppSource'
 import '@/utils/UncaughtExceptionHandler'
 import '@/schedules'
+import '@/queues'
+
 import MySQL, { diedMySQL } from '@/database/MySQL'
-import {
-    ServerAccessDatabase
-} from '@/database/Redis'
-
 import Server from "./server"
-
 import { Boolean } from '@/validation/Rules'
 /**
  * Instantiate the application
@@ -32,7 +29,6 @@ class App {
     private async init() {
         await this.initMySQLDatabase()
         await this.initMySQLDiedDatabase()
-        await this.initRedisDatabases()
         await this.initServer()
     }
 
@@ -58,20 +54,6 @@ class App {
         )
 
         if (shouldInit) return diedMySQL.init()
-    }
-
-    // ------------------------------------------------------------------------
-
-    private async initRedisDatabases() {
-        Log.out('#[warning]Trying to connect #[info]Redis #[warning]databases...')
-        Log.out('\n')
-        await ServerAccessDatabase.connect(() => Log.out(
-            `#[success]Redis #[info]ServerAccessDatabase #[success]connected`
-        ))
-
-        Log.out('\n')
-        Log.out('#[info]Redis #[success]databases connected successfuly.')
-        Log.out('\n')
     }
 
     // ------------------------------------------------------------------------

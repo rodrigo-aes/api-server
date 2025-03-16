@@ -3,5 +3,5 @@ import SignatureDatabase from "./SignatureDatabase"
 
 export {
     ServerAccessDatabase,
-    SignatureDatabase
+    SignatureDatabase,
 }

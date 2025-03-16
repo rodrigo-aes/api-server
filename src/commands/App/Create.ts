@@ -8,7 +8,9 @@ import {
     ControllerTemplate,
     RequestTemplate,
     MiddlewareTemplate,
-    ScheduleTemplate
+    ScheduleTemplate,
+    RedisDatabaseTemplate,
+    QueueTemplate
 } from '@/templates'
 
 // Decorators
@@ -20,7 +22,9 @@ type ModuleType = (
     'controller' |
     'request' |
     'middleware' |
-    'schedule'
+    'schedule' |
+    'redis-db' |
+    'queue'
 )
 
 export default class Create extends Command {
@@ -64,6 +68,21 @@ export default class Create extends Command {
             '--expression <value>',
             'Cron schedule expression'
         )
+
+        this.option(
+            '--db <value>',
+            'Redis database index'
+        )
+
+        this.option(
+            '--connection <value>',
+            'Queue Redis DB connection'
+        )
+
+        this.option(
+            '--concurrency <value>',
+            'Queue worker concurrency'
+        )
     }
 
     // ========================================================================
@@ -90,6 +109,12 @@ export default class Create extends Command {
                 break
 
             case 'schedule': this.createNewSchedule()
+                break
+
+            case "redis-db": this.createNewRedisDatabase()
+                break
+
+            case "queue": this.createNewQueue()
                 break
         }
     }
@@ -177,6 +202,40 @@ export default class Create extends Command {
             path: this.path,
             forceOverride: this.opts().forceOverride,
             expression: this.opts().expression
+        }).putFile()
+    }
+
+    // ========================================================================
+
+    private createNewRedisDatabase() {
+        new RedisDatabaseTemplate({
+            className: this.className,
+            path: this.path,
+            forceOverride: this.opts().forceOverride,
+            db: this.opts().db
+        }).putFile()
+    }
+
+    // ========================================================================
+
+    private createNewQueue() {
+        const { connection, db, forceOverride, concurrency } = this.opts()
+
+        const connectionTemplate = new RedisDatabaseTemplate({
+            className: connection,
+            path: this.path,
+            forceOverride: this.opts().forceOverride,
+            db
+        })
+
+        if (!connectionTemplate.alreadyExists()) connectionTemplate.putFile()
+
+        new QueueTemplate({
+            className: this.className,
+            path: this.path,
+            forceOverride,
+            connection,
+            concurrency
         }).putFile()
     }
 }

@@ -31,6 +31,15 @@ export default abstract class ModuleTemplate {
         this.createInterface(dest)
     }
 
+    // ------------------------------------------------------------------------
+
+    public alreadyExists(): boolean {
+        const path = this.handlePath()
+        const dest = resolve(this.base, path)
+
+        return existsSync(`${dest}/${this.handleFileName()}`)
+    }
+
     // ========================================================================
 
     private handleFileName() {
@@ -71,7 +80,6 @@ export default abstract class ModuleTemplate {
 
     private createFile(dest: string) {
         const filename = this.handleFileName()
-
         writeFileSync(`${dest}/${filename}`, Str.dedent(this.content()))
     }
 

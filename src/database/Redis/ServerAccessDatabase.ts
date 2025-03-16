@@ -1,11 +1,5 @@
 import Redis from "./Redis";
 
-import redisConfig from "@/config/redis"
+class ServerAccessDatabase extends Redis { }
 
-class ServerAccessDatabase extends Redis {
-    constructor() {
-        super(redisConfig.serverAccessDatabase.index)
-    }
-}
-
-export default new ServerAccessDatabase
+export default new ServerAccessDatabase(0)

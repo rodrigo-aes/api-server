@@ -1,11 +1,5 @@
 import Redis from "./Redis";
 
-import redisConfig from "@/config/redis";
+class SignatureDatabase extends Redis { }
 
-class SignatureDatabase extends Redis {
-    constructor() {
-        super(redisConfig.signatureDatabase.index)
-    }
-}
-
-export default new SignatureDatabase
+export default new SignatureDatabase(1)

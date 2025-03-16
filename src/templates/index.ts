@@ -4,6 +4,8 @@ import ControllerTemplate from "./modules/ControllerTemplate"
 import RequestTemplate from "./modules/RequestTemplate"
 import MiddlewareTemplate from "./modules/MiddlewareTemplate"
 import ScheduleTemplate from "./modules/ScheduleTemplate"
+import RedisDatabaseTemplate from "./modules/RedisDatabaseTemplate"
+import QueueTemplate from "./modules/QueueTemplate"
 
 export {
     CommandTemplate,
@@ -11,5 +13,7 @@ export {
     ControllerTemplate,
     RequestTemplate,
     MiddlewareTemplate,
-    ScheduleTemplate
+    ScheduleTemplate,
+    RedisDatabaseTemplate,
+    QueueTemplate
 }

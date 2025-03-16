@@ -8,6 +8,7 @@ import {
     ControllerTemplate,
     RequestTemplate,
     MiddlewareTemplate,
+    ScheduleTemplate
 } from '@/templates'
 
 // Decorators
@@ -18,7 +19,8 @@ type ModuleType = (
     'model' |
     'controller' |
     'request' |
-    'middleware'
+    'middleware' |
+    'schedule'
 )
 
 export default class Create extends Command {
@@ -57,6 +59,11 @@ export default class Create extends Command {
             '--method <value>',
             'Include method name to request'
         )
+
+        this.option(
+            '--expression <value>',
+            'Cron schedule expression'
+        )
     }
 
     // ========================================================================
@@ -80,6 +87,9 @@ export default class Create extends Command {
                 break
 
             case 'middleware': this.createNewMiddleware()
+                break
+
+            case 'schedule': this.createNewSchedule()
                 break
         }
     }
@@ -156,6 +166,17 @@ export default class Create extends Command {
             className: this.className,
             path: this.path,
             forceOverride: this.opts().forceOverride,
+        }).putFile()
+    }
+
+    // ========================================================================
+
+    private createNewSchedule() {
+        new ScheduleTemplate({
+            className: this.className,
+            path: this.path,
+            forceOverride: this.opts().forceOverride,
+            expression: this.opts().expression
         }).putFile()
     }
 }

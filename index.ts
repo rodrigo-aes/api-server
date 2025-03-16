@@ -2,6 +2,7 @@ import '@/contexts/AppGlobalContext'
 import '@/utils/Environment'
 import '@/utils/AppSource'
 import '@/utils/UncaughtExceptionHandler'
+import '@/schedules'
 import MySQL, { diedMySQL } from '@/database/MySQL'
 import {
     ServerAccessDatabase

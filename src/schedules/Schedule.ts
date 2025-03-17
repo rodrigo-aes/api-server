@@ -19,13 +19,20 @@ export default abstract class Schedule {
     }
 
     // Instance Methods =======================================================
+    /**
+     * Restart schedule
+     */
     public restart() {
         this.schedule.stop()
         this.schedule.start()
     }
 
     // ------------------------------------------------------------------------
-
+    /**
+     * Set a new cron expression and restart the with new interval
+     * 
+     * @param {string} cronExpression 
+     */
     public setInterval(cronExpression: string) {
         this.schedule.stop()
         this.cronExpression = cronExpression
@@ -33,6 +40,10 @@ export default abstract class Schedule {
     }
 
     // Protecteds -------------------------------------------------------------
+    /**
+     * Handle schedule process
+     * @param {Date | 'manual' | 'init'} now - Schedule time
+     */
     protected abstract handle(now: Date | 'manual' | 'init'): (
         void | Promise<void>
     )

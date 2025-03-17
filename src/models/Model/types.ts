@@ -1,6 +1,7 @@
 import type Model from "."
-import type { FindOptions, Optional } from "sequelize"
+import type { FindOptions, Optional, WhereAttributeHash } from "sequelize"
 import type Pagination from "./Pagination"
+import type { AssociationGetOptions } from "sequelize-typescript"
 
 export interface ModelAttributes {
     _id: string,
@@ -25,11 +26,6 @@ export type ModelCreationAttributes<
     : ModelOptionalAttributes | Props
 >
 
-export interface ModelWithPolymorphicParent extends ModelAttributes {
-    parentId: string
-    parentKey: string
-}
-
 export interface PaginateOptions<T extends Model = any> extends FindOptions<T> {
     perPage: number
 }
@@ -37,4 +33,8 @@ export interface PaginateOptions<T extends Model = any> extends FindOptions<T> {
 export type Paginated<TModel extends Model = any> = {
     data: TModel[]
     pagination: Pagination
+}
+
+export type LoadMap = {
+    [key: string]: AssociationGetOptions
 }

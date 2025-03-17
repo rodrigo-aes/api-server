@@ -13,5 +13,9 @@ export default class Redis extends IORedis {
             lazyConnect: true,
             ...options
         })
+
+        this.on('connect', () => Log.out(
+            `#[info]${this.constructor.name} #[success]connected`
+        ))
     }
 }

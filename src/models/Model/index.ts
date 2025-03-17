@@ -19,6 +19,8 @@ import {
 import RequestContext from '@/contexts/RequestContext';
 import Pagination from './Pagination';
 
+import { StaticSelf } from './Decorators'
+
 // Types
 import type {
     ModelStatic,
@@ -34,9 +36,9 @@ import type {
     ModelOptionalAttributes,
     PaginateOptions,
     Paginated,
-
-    ModelWithPolymorphicParent
+    LoadMap
 } from './types';
+import type { AssociationGetOptions } from 'sequelize-typescript';
 import type { Models } from '@/types/Models';
 
 // Exceptions
@@ -173,8 +175,41 @@ abstract class Model<
         )
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * Load one or more associations passed in arguments
+     * 
+     * @param {(keyof this | LoadMap<this>)[]} associations - Associtions keys
+     * or maps
+     * @returns {this} - `this`
+     */
+    public async load(
+        ...associations: (keyof this | LoadMap)[]
+    ): Promise<this> {
+        for (const assoc of associations) switch (typeof assoc) {
+            case 'string': this[assoc] = await this.$get(assoc) as any
+                break
+            case 'object':
+                const key = Object.keys(assoc)[0] as keyof this
+                this[key] = await this.$get(
+                    key,
+                    assoc[key as keyof typeof assoc] as AssociationGetOptions
+                ) as any
+                break
+        }
+
+        return this
+    }
+
     // Static Methods =========================================================
     // Publics ----------------------------------------------------------------
+    /**
+     * Separate ID in two parts `prefix` and `UUID`
+     * 
+     * @param {string} id - ID string 
+     * @returns - A tuple containing respective prefix and uuid
+     */
     public static sepId(id: string): [keyof Models, string] {
         return id.split('_') as [keyof Models, string]
     }
@@ -202,7 +237,7 @@ abstract class Model<
         const data = await this.self.findAll({
             ...rest,
             limit,
-            offset
+            offset,
         })
 
         const pagination = new Pagination(
@@ -358,9 +393,6 @@ abstract class Model<
 }
 
 export default Model
-
-import { StaticSelf } from './Decorators'
-import { object } from 'zod';
 
 export {
     StaticSelf

@@ -18,14 +18,13 @@ export class MySQL extends Sequelize {
 
     public async init() {
         Log.out(
-            `#[warning]Trying to connect to #[info]MySQL database #[warning]${this.getDatabaseName()}...`
+            `Trying to connect to MySQL database #[info]${this.getDatabaseName()}...`
         )
 
         await this.loadModels()
         await this.authenticate()
 
-        Log.out(`#[info]MySQL connection to #[warning]${this.getDatabaseName()}: #[success]SUCCESS`)
-        Log.out('')
+        Log.out(`MySQL connection to #[info]${this.getDatabaseName()}: #[success]SUCCESS`)
     }
 
     // ========================================================================

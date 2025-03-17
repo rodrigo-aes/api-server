@@ -52,7 +52,7 @@ class User extends Authenticable<UserAttributes, UserCreationAttributes> {
     // Static Methods =========================================================
     public static async register(
         { email, phone, ...values }: UserStoreAtrributes,
-    ) {
+    ): Promise<User> {
         const instance = await this.create(values)
 
         instance.push('emails', await instance.$create<Email>('Email', {

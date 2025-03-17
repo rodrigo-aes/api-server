@@ -89,14 +89,16 @@ export class DatabaseMigration {
     private async migrateDatabase() {
         await MySQL.init()
 
-        Log.out(`#[warning]Migrating #[info]${MySQL.getDatabaseName()}#[warning]...`)
-        Log.out('')
+        Log.out(
+            `Migrating #[info]${MySQL.getDatabaseName()}#[default]...`
+        )
 
         await MySQL.sync(this.options)
         await MySQL.close()
 
-        Log.out(`#[info]${MySQL.getDatabaseName()} #[success]migrated success!`)
-        Log.out('')
+        Log.out(
+            `#[info]${MySQL.getDatabaseName()} #[success]migrated success!`
+        )
     }
 
     // ------------------------------------------------------------------------
@@ -110,7 +112,7 @@ export class DatabaseMigration {
         )
 
         if (shouldMigrate) {
-            Log.out('==============================================================\n')
+            Log.out('========================================================')
             diedMySQL.addModels(
                 Object.values(await AppSource.loadModels())
             )
@@ -119,13 +121,15 @@ export class DatabaseMigration {
 
             await this.removeUniqueConstraints(diedMySQL)
 
-            Log.out(`#[warning]Migrating #[info]${diedMySQL.getDatabaseName()}#[warning]...`)
-            Log.out('')
+            Log.out(
+                `Migrating #[info]${diedMySQL.getDatabaseName()}#[default]...`
+            )
             await diedMySQL.sync(this.options)
             await diedMySQL.close()
 
-            Log.out(`#[info]${diedMySQL.getDatabaseName()} #[success]migrated success!`)
-            Log.out('')
+            Log.out(
+                `#[info]${diedMySQL.getDatabaseName()} #[success]migrated success!`
+            )
         }
     }
 

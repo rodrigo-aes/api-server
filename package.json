@@ -24,6 +24,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "file-type": "^20.4.1",
     "ioredis": "^5.4.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.12.0",

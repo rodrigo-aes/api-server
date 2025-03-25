@@ -4,7 +4,12 @@ import type { RequestHandler } from "express"
 import Middleware from '@/middlewares/Middleware'
 import type { MiddlewareConstructor } from "@/middlewares"
 import type { MiddlewareMap } from "@/routes/Router/types"
-import Validator, { ValidatorConstructor } from "@/validation/Validator"
+import Validator, {
+    type ValidatorConstructor
+} from "@/validation/Validator"
+import FileValidator, {
+    type FileValidatorConstructor
+} from "@/validation/FileValidator"
 import Controller, {
     type ControllerContructor
 } from "@/controllers/Controller"
@@ -15,6 +20,7 @@ export type Handler = (
     MiddlewareConstructor |
     MiddlewareMap |
     Validator |
+    FileValidator |
     ValidatorConstructor |
     ControllerTuple |
     RequestHandler
@@ -35,6 +41,10 @@ abstract class Request {
                     ))
                         this.handleController(handler)
                 }
+
+                else if (FileValidator.prototype.isPrototypeOf(
+                    handler
+                )) this.handleFileValidator(handler as FileValidator)
 
                 else this.handleMiddlware(handler as MiddlewareMap)
                 break
@@ -85,6 +95,12 @@ abstract class Request {
                 ? () => validator.handle()
                 : (...args) => new validator(...args).handle()
         )
+    }
+
+    // ------------------------------------------------------------------------
+
+    private handleFileValidator(validator: FileValidator) {
+        this._handlers.push((...args) => validator.handle(...args))
     }
 
     // ------------------------------------------------------------------------

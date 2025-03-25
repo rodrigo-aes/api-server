@@ -28,6 +28,7 @@ export default class Server {
         this.defineContexts()
         this.defineMiddlewares()
         this.defineRouter()
+        this.definePublic()
         this.listen()
     }
 
@@ -72,6 +73,12 @@ export default class Server {
 
     private defineRouter() {
         this.app.use(applicactionRouter.schema)
+    }
+
+    // ------------------------------------------------------------------------
+
+    private definePublic() {
+        this.app.use(express.static(resolve('public')))
     }
 
     // ------------------------------------------------------------------------

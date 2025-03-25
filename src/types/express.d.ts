@@ -1,5 +1,6 @@
 import type Model from "@/models/Model"
 import type Signature from "@/utils/Signature"
+import File from "@/utils/File"
 
 declare global {
     namespace Express {
@@ -13,6 +14,9 @@ declare global {
             }
 
             signature?: Signature
+
+            uploads?: File[] | { [key: string]: File[] }
+            upload?: File
         }
     }
 }

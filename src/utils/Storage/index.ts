@@ -76,8 +76,6 @@ class Storage {
         const fullPath = this.genFileName(path, await file.ext())
         this.writeFile(fullPath, file)
 
-        console.log(fullPath.length)
-
         return fullPath
     }
 

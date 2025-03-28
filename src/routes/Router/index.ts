@@ -1,6 +1,7 @@
 import {
     Router as ExpressRouter,
     type RequestHandler,
+    type ErrorRequestHandler
 } from "express";
 
 import Request, { type RequestConstructor } from "@/requests/Request"

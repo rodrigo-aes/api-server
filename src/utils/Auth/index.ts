@@ -22,8 +22,8 @@ import type { Includeable, WhereAttributeHash } from "sequelize"
 // Exceptions
 import { MissingAuthenticatedException } from "@/Exceptions/Auth"
 
-type SourceKey = keyof AuthConfig['sources']
-type DefaultSource = InstanceType<typeof Auth['_default']>
+export type SourceKey = keyof AuthConfig['sources']
+export type DefaultSource = InstanceType<typeof Auth['_default']>
 
 class Auth {
     // Instance Properties ====================================================

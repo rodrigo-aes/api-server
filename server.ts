@@ -15,6 +15,9 @@ import RequestContext from '@/contexts/RequestContext'
 // Routes
 import applicactionRouter from '@/routes'
 
+// Exceptions
+import { InternalServerError500 } from '@/Exceptions/ErrorRequestHandlers'
+
 /**
  * Instantiate a new server
  */
@@ -29,6 +32,7 @@ export default class Server {
         this.defineMiddlewares()
         this.defineRouter()
         this.definePublic()
+        this.defineErrorRequestHandler500()
         this.listen()
     }
 
@@ -79,6 +83,12 @@ export default class Server {
 
     private definePublic() {
         this.app.use(express.static(resolve('public')))
+    }
+
+    // ------------------------------------------------------------------------
+
+    private defineErrorRequestHandler500() {
+        this.app.use(InternalServerError500)
     }
 
     // ------------------------------------------------------------------------

@@ -58,13 +58,13 @@ class Phone extends Model<PhoneAttributes, PhoneCreationAttributes> {
     @Column(DataType.STRING(32))
     declare public number: string
 
-    // @AllowNull(false)
-    // @Column(DataType.STRING(64))
-    // public formated!: string
+    @AllowNull(false)
+    @Column(DataType.STRING(64))
+    public formated!: string
 
-    // @AllowNull(false)
-    // @Column(DataType.STRING(64))
-    // public formatedLocal!: string
+    @AllowNull(false)
+    @Column(DataType.STRING(64))
+    public formatedLocal!: string
 
     // Static methods =========================================================
     // Privates ---------------------------------------------------------------
@@ -78,10 +78,31 @@ class Phone extends Model<PhoneAttributes, PhoneCreationAttributes> {
         })
     }
 
+    // ------------------------------------------------------------------------
+
+    private static format(complete: string) {
+        return Str.mask(complete, {
+            mask: '+99 (99) 99999-9999'
+        })
+    }
+
+    // ------------------------------------------------------------------------
+
+    private static formatLocal(areaCode: string, number: string) {
+        return Str.mask(`${areaCode}${number}`, {
+            mask: '(99) 99999-9999'
+        })
+    }
+
     // Hooks ==================================================================
     @BeforeValidate
     protected static handleData(instance: Phone) {
         this.splitParts(instance)
+        instance.formated = this.format(instance.complete)!
+        instance.formatedLocal = this.formatLocal(
+            instance.areaCode,
+            instance.number
+        )!
     }
 }
 

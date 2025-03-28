@@ -1,6 +1,13 @@
 import { v4 } from "uuid";
 import RandExp from "randexp";
 
+import {
+    MaskValue,
+    UnmaskValue,
+    type MaskValueProps,
+    type UnmaskValueProps
+} from "@/utils/Mask";
+
 // Utils
 import Hash from "@/utils/Hash";
 
@@ -20,15 +27,43 @@ export default class Str extends String {
 
     // ------------------------------------------------------------------------
 
+    /**
+     * Generate a hash string to compare with the original string
+     * @param {string} string - Original string 
+     * @returns {string} - Hashed string
+     */
     public static hash(string: string) {
         return Hash.make(string)
     }
 
     // ------------------------------------------------------------------------
 
-    public static random(length: number) {
+    /**
+     * Generate a radom string with a length
+     * @param {number} length - String length 
+     * @returns {string} - Random string
+     */
+    public static random(length: number): string {
         const regex = new RegExp(`^[a-zA-Z0-9]{${length}}$`)
         return new RandExp(regex).gen()
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Apply a mask to a string value
+     */
+    public static mask(value: string, config: MaskValueProps) {
+        return MaskValue(value, config)
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Revert a mask apllied to a string value
+     */
+    public static unmask(value: string, config: UnmaskValueProps) {
+        return UnmaskValue(value, config)
     }
 
     // ------------------------------------------------------------------------
